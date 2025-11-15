@@ -1,0 +1,10 @@
+.User-container {
+  /* border-radius: 20px; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 0.5s ease;
+  opacity: 0;
+}

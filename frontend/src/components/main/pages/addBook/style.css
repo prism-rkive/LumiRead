@@ -1,0 +1,66 @@
+.Addbook {
+  min-height: 100%;
+  width: 100%;
+  display: flex;
+}
+.addbook-cover {
+  width: 25%;
+  height: 60%;
+  padding: 30px;
+}
+.addbook-container {
+  width: 75%;
+  min-height: 100%;
+  padding: 30px;
+}
+.addbook-form {
+  display: table;
+  width: 60%;
+  height: 60%;
+}
+.addbook-field {
+  width: 80%;
+  display: table-cell;
+  height: 2.75em;
+  border: none;
+  outline: none;
+  margin-top: 0.25em;
+  margin-bottom: 1em;
+  border-radius: 2em;
+  padding-left: 1em;
+  padding-right: 1em;
+  box-shadow: -1px 2px 0 2px #4e4376af;
+  background-color: whitesmoke;
+}
+label {
+  display: table-cell;
+  font-size: 1.5em;
+}
+p {
+  display: table-row;
+}
+textarea {
+  display: table-cell;
+  border: none;
+  outline: none;
+  margin-top: 0.25em;
+  margin-bottom: 1em;
+  border-radius: 1em;
+  padding: 1em;
+  box-shadow: -1px 2px 0 2px #4e4376af;
+  background-color: whitesmoke;
+  position: relative;
+  height: 10em;
+  width: 80%;
+}
+.addbook-cover {
+  display: flex;
+  flex-direction: column;
+}
+.addbook-cover img {
+  height: 95%;
+  width: 100%;
+}
+a {
+  color: rgb(100, 129, 138);
+}

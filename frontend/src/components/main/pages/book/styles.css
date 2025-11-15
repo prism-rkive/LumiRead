@@ -1,0 +1,63 @@
+.Book-details {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: calc(45vh - 12px) calc(45vh - 12px);
+  grid-template-columns: 25fr 50fr 25fr;
+}
+.Book-cover {
+  grid-row: 1/2;
+  grid-column: 1/2;
+  padding: 30px;
+}
+.Book-review {
+  grid-row: 2/3;
+  grid-column: 1/2;
+  padding-left: 30px;
+  padding-top: 30px;
+  overflow-y: scroll;
+}
+.Book-description {
+  grid-row: 1/2;
+  grid-column: 2/3;
+  padding: 30px;
+  overflow-y: scroll;
+}
+.Book-data {
+  grid-row: 1/2;
+  grid-column: 3/4;
+  overflow-y: scroll;
+}
+.Book-reviews {
+  grid-row: 2/3;
+  grid-column: 2/4;
+  overflow-y: scroll;
+  padding: 30px;
+}
+.Book-cover img {
+  width: 100%;
+  height: 100%;
+  border: 2px solid #c0c0c0;
+}
+.Book-reviews p,
+.Book-review p,
+.Book-description p {
+  font-size: 0.95em;
+  width: 100%;
+  height: 100%;
+  text-align: justify;
+}
+.Book-data p {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+.user-review {
+  border: 1px solid #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+label a {
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+}
