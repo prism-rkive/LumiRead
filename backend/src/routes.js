@@ -22,6 +22,10 @@ router.post('/isAuthed',checkAuth,isAuthed);
 const addbook = require('./client/addbook');
 router.post('/addbook',checkAuth,addbook);
 
+const checkBook = require('./client/checkBook');
+
+router.post('/checkbook',checkBook)
+
 
 
 
