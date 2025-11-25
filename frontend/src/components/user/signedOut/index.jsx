@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import api from "../../../service/api";
+import { useNavigate } from "react-router-dom";
 import "./style.css";
 
 function SignedOut() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
   const [name, setName] = useState("");
   const [nameValid, setNameValid] = useState(true);
@@ -38,14 +40,21 @@ function SignedOut() {
       try {
         const res = await api.post("/login", { username, password });
         if (res.data.status) {
-          localStorage.setItem("currentUser", JSON.stringify(res.data));
-          window.location.href = "/";
-        } else {
+          console.log("About to save to localStorage:", res.data);
+  localStorage.setItem("currentUser", JSON.stringify(res.data));
+  console.log("Saved to localStorage:", localStorage.getItem("currentUser"));
+  //setTimeout(() => {
+   // window.location.reload();
+//  }, 100);
+navigate('/addbook');
+}
+         else {
           setMessage("Invalid credentials");
           setUsernameValid(false);
           setPasswordValid(false);
         }
       } catch (e) {
+        console.log("Login error:", e);
         setMessage("Login failed. Please try again.");
         setUsernameValid(false);
         setPasswordValid(false);

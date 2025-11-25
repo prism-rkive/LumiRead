@@ -26,6 +26,48 @@ function Addbook() {
   const [preview, setPreview] = useState(null);
   const logo_up = React.useRef(null);
   const [disable, setDisable] = useState(false);
+  const [checkingBook, setCheckingBook] = useState(false);
+  const [bookExists, setBookExists] = useState(false);
+  const [existingBookData, setExistingBookData] = useState(null);
+  const [checkMessage, setCheckMessage] = useState("");
+
+  const checkIfBookExists = async () => {
+    // Reset states
+    setCheckMessage("");
+    setBookExists(false);
+    setExistingBookData(null);
+    
+    // Validate ISBN is entered
+    if (ibn === "") {
+      setCheckMessage("Please enter ISBN first");
+      setIbnValid(false);
+      return;
+    }
+    
+    setIbnValid(true);
+    setCheckingBook(true);
+    
+    try {
+      const res = await api.post('/checkbook', { ibn });
+      
+      if (res.data.status && res.data.exists) {
+        // Book exists
+        setBookExists(true);
+        setExistingBookData(res.data.book);
+        setCheckMessage(`Book already exists: ${res.data.book.title}`);
+      } else if (res.data.status && !res.data.exists) {
+        // Book doesn't exist
+        setBookExists(false);
+        setCheckMessage("Book not found in database. You can add it!");
+      } else {
+        setCheckMessage("Error checking book");
+      }
+    } catch (error) {
+      setCheckMessage("Error: " + error.message);
+    }
+    
+    setCheckingBook(false);
+  };
 
   const handleBook = async (e) => {
     e.preventDefault();
@@ -143,6 +185,7 @@ function Addbook() {
       setMessege("" + e);
     }
   };
+
   return (
     <>
       <div className="Addbook">
@@ -187,9 +230,38 @@ function Addbook() {
                 value={ibn}
                 onChange={(e) => {
                   setIbn(e.target.value);
+                  // Reset check when ISBN changes
+                  setBookExists(false);
+                  setCheckMessage("");
                 }}
               />
+              <button
+                type="button"
+                className="input-button"
+                onClick={checkIfBookExists}
+                disabled={checkingBook}
+                style={{ marginLeft: "10px" }}
+              >
+                {checkingBook ? "Checking..." : "Check ISBN"}
+              </button>
             </p>
+            {checkMessage && (
+              <p style={{ 
+                color: bookExists ? "red" : "green",
+                fontWeight: "bold",
+                marginLeft: "150px"
+              }}>
+                {checkMessage}
+                {bookExists && existingBookData && (
+                  <a 
+                    href={`/book/${existingBookData.ibn}`}
+                    style={{ marginLeft: "10px", color: "blue" }}
+                  >
+                    View Book
+                  </a>
+                )}
+              </p>
+            )}
             <p>
               <label>Book title :</label>
               <input
@@ -289,7 +361,7 @@ function Addbook() {
               <button
                 style={{ margin: "3em 2em 0 0" }}
                 className="input-button"
-                disabled={disable}
+                disabled={disable || bookExists}
                 type="submit"
               >
                 Add Book

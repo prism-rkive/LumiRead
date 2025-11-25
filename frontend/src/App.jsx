@@ -1,19 +1,46 @@
 import "./App.css";
-import MainComponent from "./components/main";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Filter from "./components/main/filter";
 import Header from "./components/main/header";
 import UserComponent from "./components/user";
+import AddBookPage from "./components/main/pages/addBook/index"; // Add /index
+
+// Protected Route - only accessible if logged in
+const ProtectedRoute = ({ children }) => {
+  const user = localStorage.getItem('currentUser');
+  return user ? children : <Navigate to="/" />;
+};
+
+// Public Route - redirects to /addbook if already logged in
+const PublicRoute = ({ children }) => {
+  const user = localStorage.getItem('currentUser');
+  return user ? <Navigate to="/addbook" /> : children;
+};
 
 function App() {
   return (
-    <div className="App">
-      <div className="Main-wraper">
-        <Filter />
-        <Header />
-        <MainComponent />
+    <BrowserRouter>
+      <div className="App">
+        <Routes>
+          {/* Login/Register page */}
+          <Route path="/" element={
+            <PublicRoute>
+              <UserComponent />
+            </PublicRoute>
+          } />
+
+          {/* Add Book page */}
+          <Route path="/addbook" element={
+            <ProtectedRoute>
+              <div className="Main-wraper">
+                <Header />
+                <AddBookPage />
+              </div>
+            </ProtectedRoute>
+          } />
+        </Routes>
       </div>
-      <UserComponent />
-    </div>
+    </BrowserRouter>
   );
 }
 
