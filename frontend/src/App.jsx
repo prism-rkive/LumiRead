@@ -32,10 +32,7 @@ function App() {
           {/* Add Book page */}
           <Route path="/addbook" element={
             <ProtectedRoute>
-              <div className="Main-wraper">
-                <Header />
-                <AddBookPage />
-              </div>
+              <AddBookPage />
             </ProtectedRoute>
           } />
         </Routes>

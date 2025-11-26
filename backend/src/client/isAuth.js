@@ -1,20 +1,19 @@
 const users = require("../models/users");
 
-const isAuthed = async (req, res)=>
-{
-    const user_id = req.body.user_id;
+const isAuthed = async (req, res) => {
+    const user_id = req.userData.user_id;
     const loggedUser = await users.findById(user_id);
-    if(!loggedUser){
+    if (!loggedUser) {
         return res.json({
-            status : false,
+            status: false,
             auth_status: false,
-            message : "User doesn't exit",
+            message: "User doesn't exit",
         });
     }
-    else{
+    else {
         return res.json({
-            status : true,
-            auth_status : true,
+            status: true,
+            auth_status: true,
         });
     }
 }
