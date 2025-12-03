@@ -4,6 +4,8 @@ import Filter from "./components/main/filter";
 import Header from "./components/main/header";
 import UserComponent from "./components/user";
 import AddBookPage from "./components/main/pages/addBook/index"; // Add /index
+import SearchPage from "./components/main/pages/search/index";
+import BookDetails from "./components/main/pages/book/index";
 
 // Protected Route - only accessible if logged in
 const ProtectedRoute = ({ children }) => {
@@ -33,6 +35,20 @@ function App() {
           <Route path="/addbook" element={
             <ProtectedRoute>
               <AddBookPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Search page */}
+          <Route path="/search" element={
+            <ProtectedRoute>
+              <SearchPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Book Details page */}
+          <Route path="/book/:ibn" element={
+            <ProtectedRoute>
+              <BookDetails />
             </ProtectedRoute>
           } />
         </Routes>

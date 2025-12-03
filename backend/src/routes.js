@@ -17,14 +17,22 @@ router.post('/login', login);
 
 
 const isAuthed = require("./client/isAuth");
-router.post('/isAuthed',checkAuth,isAuthed);
+router.post('/isAuthed', checkAuth, isAuthed);
 
 const addbook = require('./client/addbook');
-router.post('/addbook',checkAuth,addbook);
+router.post('/addbook', checkAuth, addbook);
 
 const checkBook = require('./client/checkBook');
 
-router.post('/checkbook',checkBook)
+router.post('/checkbook', checkBook)
+
+const search = require('./client/search');
+router.post('/search', search);
+
+const getBook = require('./client/getBook');
+router.post('/getbook', getBook);
+
+
 
 
 
