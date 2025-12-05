@@ -1,0 +1,12 @@
+# dependencies
+/node_modules
+
+# environment variables
+.env
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+
+# optional
+.DS_Store
