@@ -1,11 +1,28 @@
-// src/App.jsx
 import React, { useEffect, useState, useCallback } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import Homepage from "./pages/HomePage";
 import CommunityFeed from "./pages/CommunityFeed";
+import Filter from "./components/main/filter";
+import Header from "./components/main/header";
+import UserComponent from "./components/user";
+import AddBookPage from "./components/main/pages/addBook/index";
+import SearchPage from "./components/main/pages/search/index";
+import BookDetails from "./components/main/pages/book/index";
+
+// Protected Route
+const ProtectedRoute = ({ children }) => {
+  const user = localStorage.getItem('currentUser');
+  return user ? children : <Navigate to="/" />;
+};
+
+// Public Route
+const PublicRoute = ({ children }) => {
+  const user = localStorage.getItem('currentUser');
+  return user ? <Navigate to="/addbook" /> : children;
+};
 
 function App() {
-  // theme: 'light'|'dark'
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
@@ -24,20 +41,46 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-      <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route
-          path="/home"
-          element={<Homepage theme={theme} toggleTheme={toggleTheme} />}
-        />
-        <Route
-          path="/community"
-          element={<CommunityFeed toggleTheme={toggleTheme} theme={theme} />}
-        />
-        {/* Add more routes: /add-book, /search, /profile etc. */}
-      </Routes>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors App">
+        <Routes>
+          {/* Login/Register page */}
+          <Route path="/" element={
+            <PublicRoute>
+              <UserComponent />
+            </PublicRoute>
+          } />
+
+          {/* Homepage and community feed */}
+          <Route path="/home" element={<Homepage theme={theme} toggleTheme={toggleTheme} />} />
+          <Route path="/community" element={<CommunityFeed theme={theme} toggleTheme={toggleTheme} />} />
+
+          {/* Add Book page */}
+          <Route path="/addbook" element={
+            <ProtectedRoute>
+              <AddBookPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Search page */}
+          <Route path="/search" element={
+            <ProtectedRoute>
+              <SearchPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Book Details page */}
+          <Route path="/book/:ibn" element={
+            <ProtectedRoute>
+              <BookDetails />
+            </ProtectedRoute>
+          } />
+
+          {/* Redirect any unknown route */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

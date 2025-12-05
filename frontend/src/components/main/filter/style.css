@@ -1,0 +1,17 @@
+.Filter {
+  display: flex;
+  flex-direction: column;
+}
+.Filter-genre {
+  height: calc(100% / 3);
+  width: 100%;
+  padding: 6px;
+  overflow-y: scroll;
+}
+.Filter button {
+  padding: 0.3em 0.5em 0.3em 0.5em;
+  border-radius: 1em;
+  border: none;
+  margin: 0.5em;
+  white-space: nowrap;
+}
