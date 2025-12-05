@@ -1,0 +1,5 @@
+mongodb+srv://u2104002:<db_password>@lumiread.lusuha2.mongodb.net/?appName=LumiRead
+
+
+
+HrIH9jnVChlKSyhj
