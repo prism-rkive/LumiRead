@@ -1,20 +1,17 @@
 // src/index.js
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import "./styles/index.css";
+import "./index.css"; // use this path if your main CSS is index.css
 import reportWebVitals from "./reportWebVitals";
 
+// Create root and render App
 const root = createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <App />
   </React.StrictMode>
 );
 
 // Optional: measure performance
 reportWebVitals();
-

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Homepage from "./pages/HomePage";
@@ -10,19 +11,20 @@ import AddBookPage from "./components/main/pages/addBook/index";
 import SearchPage from "./components/main/pages/search/index";
 import BookDetails from "./components/main/pages/book/index";
 
-// Protected Route
+// Protected Route - only accessible if logged in
 const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem('currentUser');
   return user ? children : <Navigate to="/" />;
 };
 
-// Public Route
+// Public Route - redirects to /addbook if already logged in
 const PublicRoute = ({ children }) => {
   const user = localStorage.getItem('currentUser');
   return user ? <Navigate to="/addbook" /> : children;
 };
 
 function App() {
+  // Theme: 'light' | 'dark'
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
