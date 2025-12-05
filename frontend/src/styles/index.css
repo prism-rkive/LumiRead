@@ -1,0 +1,12 @@
+/* src/styles/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add any project-wide overrides here. Keep color palette usage consistent with the components (red/green/gray). */
+:root {
+  --primary: #ef4444; /* red-500 */
+  --primary-dark: #dc2626; /* red-600 */
+}
+
+/* Small utility if you want to style scrollbar, etc */
