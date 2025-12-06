@@ -1,14 +1,136 @@
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+// Generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
+
+// @desc    Register a new user
+// @route   POST /api/user/register
+// @access  Public
+export const registerUser = async (req, res) => {
+  const { name, email, password, username, number } = req.body;
+
+  if (!name || !password || !username) {
+    return res.json({ status: false, type: "empty" }); // Legacy behavior
+  }
+
+  // Note: Email is new, so we handle it gracefully or skip if not in legacy form, 
+  // but let's keep it required as per new model. 
+  // If legacy frontend doesn't send email, we might have an issue. 
+  // Wait, frontend doesn't seem to send email!
+  // Checks:
+  // if (name === "") ... 
+  // if (number === "") ...
+  // if (password !== password2) ...
+  // api.post("/register", { name, number, username, password });
+
+  // Frontend DOES NOT SEND EMAIL.
+  // We need to generate a dummy email or make it optional in model.
+  // For now, let's generate one or make it optional.
+  // Since User model has `email: { type: String, required: true, unique: true }`, this will fail.
+
+  // I MUST FIX THE MODEL or generate an email.
+  const generatedEmail = email || `${username}@example.com`; // Fallback
+
+  // Check if username exists
+  const usernameExists = await User.findOne({ username });
+  if (usernameExists) {
+    return res.json({ status: false, type: "username" });
+  }
+
+  // Check if number exists (if number is provided)
+  if (number) {
+    const numberExists = await User.findOne({ number });
+    if (numberExists) {
+      return res.json({ status: false, type: "number" });
+    }
+  }
+
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Create user
+  try {
+    const user = await User.create({
+      name,
+      email: generatedEmail,
+      username,
+      number,
+      password: hashedPassword,
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        token: generateToken(user._id),
+        status: true, // Legacy success flag
+      });
+    } else {
+      res.json({ status: false, message: "Invalid user data" });
+    }
+  } catch (error) {
+    // Check for email duplicate if we generated one that exists
+    if (error.code === 11000 && error.keyPattern.email) {
+      // Try again with random? existing logic allows dup emails if we just fake it. 
+      // Realistically we should ask user for email, but legacy doesn't have it.
+      // I will return a generic error.
+      res.status(500).json({ status: false, error: error.message });
+    } else {
+      res.status(500).json({ status: false, error: error.message });
+    }
+  }
+};
+
+// @desc    Authenticate a user
+// @route   POST /api/user/login
+// @access  Public
+export const authUser = async (req, res) => {
+  const { username, password } = req.body;
+
+  console.log("Login attempt:", { username, passwordProvided: !!password });
+
+  const user = await User.findOne({ username });
+
+  console.log("User found:", user ? user.username : "No user");
+
+  if (user && (await bcrypt.compare(password, user.password))) {
+    res.json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      token: generateToken(user._id),
+      // legacy support
+      status: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username
+      }
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid credentials");
+  }
+};
 
 // GET /api/user/me
 export const getUserProfile = async (req, res) => {
-  // In a real app, you'd use req.user.id from auth middleware.
-  // For now, we fetch the first user to simulate a logged-in user.
-  const user = await User.findOne().select("-password");
+  // Use the user attached by the 'protect' middleware
+  const user = req.user;
 
   if (!user) {
     res.status(404);
-    throw new Error("User not found. Please seed the database.");
+    throw new Error("User not found");
   }
 
   res.json({
@@ -16,6 +138,25 @@ export const getUserProfile = async (req, res) => {
     name: user.name,
     email: user.email,
     avatar: user.avatar,
-    readingGoals: user.readingGoals, // Matches what HomePage expects
+    readingGoals: user.readingGoals,
   });
+};
+
+// @desc    Check auth status (Legacy support)
+// @route   POST /api/user/isAuthed
+// @access  Private
+export const isAuthed = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.json({ auth_status: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded) {
+      return res.json({ auth_status: true, user: decoded });
+    }
+  } catch (error) {
+    return res.json({ auth_status: false });
+  }
 };

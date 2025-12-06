@@ -3,6 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Homepage from "./pages/HomePage";
+import LandingPage from "./pages/LandingPage";
 import CommunityFeed from "./pages/CommunityFeed";
 import Filter from "./components/main/filter";
 import Header from "./components/main/header";
@@ -17,10 +18,10 @@ const ProtectedRoute = ({ children }) => {
   return user ? children : <Navigate to="/" />;
 };
 
-// Public Route - redirects to /addbook if already logged in
+// Public Route - redirects to /home if already logged in
 const PublicRoute = ({ children }) => {
   const user = localStorage.getItem('currentUser');
-  return user ? <Navigate to="/addbook" /> : children;
+  return user ? <Navigate to="/home" /> : children;
 };
 
 function App() {
@@ -46,15 +47,27 @@ function App() {
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors App">
         <Routes>
-          {/* Login/Register page */}
+          {/* Public Landing Page */}
           <Route path="/" element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          } />
+
+          {/* Login/Register page */}
+          <Route path="/login" element={
             <PublicRoute>
               <UserComponent />
             </PublicRoute>
           } />
 
-          {/* Homepage and community feed */}
-          <Route path="/home" element={<Homepage theme={theme} toggleTheme={toggleTheme} />} />
+          {/* Homepage - PROTECTED */}
+          <Route path="/home" element={
+            <ProtectedRoute>
+              <Homepage theme={theme} toggleTheme={toggleTheme} />
+            </ProtectedRoute>
+          } />
+
           <Route path="/community" element={<CommunityFeed theme={theme} toggleTheme={toggleTheme} />} />
 
           {/* Add Book page */}
@@ -79,7 +92,7 @@ function App() {
           } />
 
           {/* Redirect any unknown route */}
-          <Route path="*" element={<Navigate to="/home" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </BrowserRouter>

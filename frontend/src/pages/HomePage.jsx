@@ -59,7 +59,8 @@ export default function HomePage() {
   };
 
   const handleLogout = () => {
-    navigate("/login");
+    localStorage.removeItem("currentUser"); // Ensure token is cleared
+    navigate("/");
   };
 
   if (loading) {
@@ -86,7 +87,7 @@ export default function HomePage() {
   const userName = user?.name || "User";
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors font-sans">
+    <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors font-sans">
       {/* Header: Centered and Padded */}
       <header className="flex justify-between items-center max-w-7xl mx-auto py-2 px-4 sm:px-8 mb-8">
         <h1 className="text-3xl font-extrabold text-red-700 dark:text-red-400">
@@ -140,13 +141,13 @@ export default function HomePage() {
             <ActionButton
               icon={BookPlus}
               label="Add New Book"
-              onClick={() => handleNavigation("/books/add")}
+              onClick={() => handleNavigation("/addbook")}
               className="flex-grow sm:flex-grow-0 min-w-[180px]"
             />
             <ActionButton
               icon={Search}
               label="Search Catalog"
-              onClick={() => handleNavigation("/catalog/search")}
+              onClick={() => handleNavigation("/search")}
               className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             />
             <ActionButton

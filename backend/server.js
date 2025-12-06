@@ -7,6 +7,7 @@ import userRoutes from "./routes/userRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import communityRoutes from "./routes/communityRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import { registerUser, authUser } from "./controllers/userController.js";
 
 dotenv.config();
 connectDB();
@@ -32,6 +33,16 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/community", communityRoutes);
+
+// Legacy support for stale frontends
+app.post("/register", registerUser);
+app.post("/login", authUser);
+
+import { searchBooks, checkBook, addBook, getBook } from "./controllers/bookController.js";
+app.post("/search", searchBooks);
+app.post("/checkbook", checkBook);
+app.post("/addbook", addBook);
+app.post("/getbook", getBook);
 
 // Error Handling Middleware
 app.use(notFound);

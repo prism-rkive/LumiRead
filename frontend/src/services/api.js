@@ -9,8 +9,21 @@ export const API_ROOT = BASE_URL;
 
 async function fetchJson(path, options = {}) {
   // Use BASE_URL consistently
+  const token = localStorage.getItem("currentUser")
+    ? JSON.parse(localStorage.getItem("currentUser")).token
+    : null;
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     credentials: "include",
     ...options,
   });

@@ -38,17 +38,17 @@ function SignedOut() {
 
     if (isLogin) {
       try {
-        const res = await api.post("/login", { username, password });
+        const res = await api.post("/api/user/login", { username, password });
         if (res.data.status) {
           console.log("About to save to localStorage:", res.data);
-  localStorage.setItem("currentUser", JSON.stringify(res.data));
-  console.log("Saved to localStorage:", localStorage.getItem("currentUser"));
-  //setTimeout(() => {
-   // window.location.reload();
-//  }, 100);
-navigate('/addbook');
-}
-         else {
+          localStorage.setItem("currentUser", JSON.stringify(res.data));
+          console.log("Saved to localStorage:", localStorage.getItem("currentUser"));
+          //setTimeout(() => {
+          // window.location.reload();
+          //  }, 100);
+          navigate('/home');
+        }
+        else {
           setMessage("Invalid credentials");
           setUsernameValid(false);
           setPasswordValid(false);
@@ -76,7 +76,7 @@ navigate('/addbook');
         return;
       }
       try {
-        const res = await api.post("/register", {
+        const res = await api.post("/api/user/register", {
           name,
           number,
           username,
@@ -84,10 +84,10 @@ navigate('/addbook');
         });
         if (res.data.status) {
           setMessage("Success! You can login now");
-             setTimeout(() => {
-             setIsLogin(true);
-             setMessage("");
-  }, 1500);
+          setTimeout(() => {
+            setIsLogin(true);
+            setMessage("");
+          }, 1500);
         } else if (res.data.type === "username") {
           setUsernameValid(false);
           setMessage("Username already taken");
@@ -103,137 +103,137 @@ navigate('/addbook');
     }
   };
 
-return (
-  <div className="auth-container">
-    {/* Left Side - Background Image */}
-    <div className="auth-left">
-      <div className="auth-left-content">
-        <h1>LumiRead</h1>
-        <p>Track, review, and discover your next favorite book</p>
-      </div>
-    </div>
-
-    {/* Right Side - Form */}
-    <div className="auth-right">
-      <div className="auth-form-container">
-        <div className="auth-form-header">
-          <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
-          <p>{isLogin ? "Login to your account" : "Enter your details to get started"}</p>
+  return (
+    <div className="auth-container">
+      {/* Left Side - Background Image */}
+      <div className="auth-left">
+        <div className="auth-left-content">
+          <h1>LumiRead</h1>
+          <p>Track, review, and discover your next favorite book</p>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          {!isLogin && (
-            <div className="form-group">
-              <label>Full Name</label>
-              <input
-                type="text"
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className={!nameValid ? "error" : ""}
-              />
-            </div>
-          )}
-
-          {!isLogin && (
-            <div className="form-group">
-              <label>Mobile Number</label>
-              <input
-                type="text"
-                placeholder="1234567890"
-                value={number}
-                onChange={(e) => setNumber(e.target.value)}
-                className={!numberValid ? "error" : ""}
-              />
-            </div>
-          )}
-
-          <div className="form-group">
-            <label>Username</label>
-            <input
-              type="text"
-              placeholder={isLogin ? "Enter your username" : "Choose a username"}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className={!usernameValid ? "error" : ""}
-            />
+      {/* Right Side - Form */}
+      <div className="auth-right">
+        <div className="auth-form-container">
+          <div className="auth-form-header">
+            <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
+            <p>{isLogin ? "Login to your account" : "Enter your details to get started"}</p>
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={!passwordValid ? "error" : ""}
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="auth-form">
+            {!isLogin && (
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={!nameValid ? "error" : ""}
+                />
+              </div>
+            )}
 
-          {!isLogin && (
+            {!isLogin && (
+              <div className="form-group">
+                <label>Mobile Number</label>
+                <input
+                  type="text"
+                  placeholder="1234567890"
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  className={!numberValid ? "error" : ""}
+                />
+              </div>
+            )}
+
             <div className="form-group">
-              <label>Confirm Password</label>
+              <label>Username</label>
+              <input
+                type="text"
+                placeholder={isLogin ? "Enter your username" : "Choose a username"}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className={!usernameValid ? "error" : ""}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Password</label>
               <input
                 type="password"
                 placeholder="••••••••"
-                value={password2}
-                onChange={(e) => setPassword2(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className={!passwordValid ? "error" : ""}
               />
             </div>
-          )}
 
-          {message && (
-            <div className={`message ${message.includes("Success") ? "success" : "error"}`}>
-              {message}
+            {!isLogin && (
+              <div className="form-group">
+                <label>Confirm Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password2}
+                  onChange={(e) => setPassword2(e.target.value)}
+                  className={!passwordValid ? "error" : ""}
+                />
+              </div>
+            )}
+
+            {message && (
+              <div className={`message ${message.includes("Success") ? "success" : "error"}`}>
+                {message}
+              </div>
+            )}
+
+            <button type="submit" className="auth-button">
+              {isLogin ? "Login" : "Create Account"}
+            </button>
+
+            <div className="auth-footer">
+              {isLogin ? (
+                <p>
+                  Don't have an account?{" "}
+                  <span onClick={() => {
+                    setIsLogin(false);
+                    setMessage("");
+                    setName("");
+                    setNumber("");
+                    setUsername("");
+                    setPassword("");
+                    setPassword2("");
+                    setNameValid(true);
+                    setNumberValid(true);
+                    setUsernameValid(true);
+                    setPasswordValid(true);
+                  }}>
+                    Sign Up
+                  </span>
+                </p>
+              ) : (
+                <p>
+                  Already have an account?{" "}
+                  <span onClick={() => {
+                    setIsLogin(true);
+                    setMessage("");
+                    setUsername("");
+                    setPassword("");
+                    setUsernameValid(true);
+                    setPasswordValid(true);
+                  }}>
+                    Login
+                  </span>
+                </p>
+              )}
             </div>
-          )}
-
-          <button type="submit" className="auth-button">
-            {isLogin ? "Login" : "Create Account"}
-          </button>
-
- <div className="auth-footer">
-  {isLogin ? (
-    <p>
-      Don't have an account?{" "}
-      <span onClick={() => {
-        setIsLogin(false);
-        setMessage("");
-        setName("");
-        setNumber("");
-        setUsername("");
-        setPassword("");
-        setPassword2("");
-        setNameValid(true);
-        setNumberValid(true);
-        setUsernameValid(true);
-        setPasswordValid(true);
-      }}>
-        Sign Up
-      </span>
-    </p>
-  ) : (
-    <p>
-      Already have an account?{" "}
-      <span onClick={() => {
-        setIsLogin(true);
-        setMessage("");
-        setUsername("");
-        setPassword("");
-        setUsernameValid(true);
-        setPasswordValid(true);
-      }}>
-        Login
-      </span>
-    </p>
-  )}
-</div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default SignedOut;

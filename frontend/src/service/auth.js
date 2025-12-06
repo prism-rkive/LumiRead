@@ -6,7 +6,7 @@ const checkAuth = async () => {
     const jwt = JSON.parse(obj);
     try {
       const res = await api.post(
-        "/isAuthed",
+        "/api/user/isAuthed",
         {},
         {
           headers: { Authorization: `Bearer ${jwt.token}` },
