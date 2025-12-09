@@ -9,12 +9,33 @@ function BookDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [hoverRating, setHoverRating] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [myReview, setMyReview] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
   useEffect(() => {
     const fetchBook = async () => {
       try {
         const res = await api.post("/getbook", { ibn });
         if (res.data.status) {
           setBook(res.data.data);
+          // Check if current user has reviewed and set state
+          if (currentUser._id && res.data.data.reviews) {
+            const userReview = res.data.data.reviews.find(r =>
+              (r.user_id && r.user_id._id === currentUser._id) || r.user_id === currentUser._id
+            );
+            if (userReview) {
+              setMyReview(userReview);
+              setReviewRating(userReview.rating);
+              setReviewText(userReview.comment || "");
+            }
+          }
         } else {
           setError(res.data.message || "Book not found");
         }
@@ -30,6 +51,51 @@ function BookDetails() {
       fetchBook();
     }
   }, [ibn]);
+
+  const submitReview = async () => {
+    if (reviewRating === 0) {
+      alert("Please select a star rating");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const token = currentUser.token; // Assuming token is in currentUser object
+      if (!token) {
+        alert("You must be logged in to review");
+        return;
+      }
+
+      const res = await api.post("/addreview", {
+        ibn,
+        rating: reviewRating,
+        comment: reviewText
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (res.data.status) {
+        setBook(res.data.data); // Update book with new reviews
+
+        setMyReview({
+          ...myReview,
+          rating: reviewRating,
+          comment: reviewText,
+          date: Date.now()
+        });
+        setIsEditing(false);
+        alert(myReview ? "Review updated!" : "Review posted successfully!");
+      } else {
+        alert(res.data.message || "Failed to submit review");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error submitting review");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) return <div className="book-details-page"><div className="book-details-wrapper">Loading...</div></div>;
   if (error) return <div className="book-details-page"><div className="book-details-wrapper">{error}</div></div>;
@@ -62,7 +128,7 @@ function BookDetails() {
           <div className="book-meta">
             <div className="rating-container">
               <span className="rating-star">★</span>
-              <span>{book.avg_rating || 0}</span>
+              <span>{book.avg_rating ? book.avg_rating.toFixed(2) : 0}</span>
             </div>
             <span className="meta-divider">•</span>
             <span>{book.reviews ? book.reviews.length : 0} ratings</span>
@@ -97,10 +163,92 @@ function BookDetails() {
               </div>
             </div>
           </div>
+
+          {/* Reviews Section */}
+          <div className="reviews-section">
+            <h2 className="section-title">
+              {myReview && !isEditing ? "My Review" : "Rate this book"}
+            </h2>
+
+            <div className="write-review-container">
+              {!isEditing && myReview ? (
+                <div className="my-review-display">
+                  <div className="review-header">
+                    <div className="date-stars-row">
+                      <div className="review-stars display-mode">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className={`star-display ${i < myReview.rating ? "filled" : ""}`}>★</span>
+                        ))}
+                      </div>
+                      <span className="review-date">
+                        {new Date(myReview.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </span>
+                    </div>
+                    <button
+                      className="edit-review-btn"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Edit Review
+                    </button>
+                  </div>
+                  <div className="review-content-display">
+                    {myReview.comment ? (
+                      <p className="review-text">{myReview.comment}</p>
+                    ) : (
+                      <p className="no-comment-text">No written review.</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="user-review-header">
+                    <span className="write-review-title">What do you think?</span>
+                  </div>
+                  <div className="star-rating-input">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`star-input ${star <= (hoverRating || reviewRating) ? "active" : ""}`}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        onClick={() => setReviewRating(star)}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <textarea
+                    className="review-textarea"
+                    placeholder="Write your review..."
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                  />
+                  <div className="review-actions">
+                    <button
+                      className="submit-review-btn"
+                      onClick={submitReview}
+                      disabled={submitting}
+                    >
+                      {submitting ? "Posting..." : (myReview ? "Update Review" : "Post Review")}
+                    </button>
+                    {isEditing && (
+                      <button
+                        className="cancel-review-btn"
+                        onClick={() => setIsEditing(false)}
+                        disabled={submitting}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   );
 }
-
 export default BookDetails;

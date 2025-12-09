@@ -123,7 +123,7 @@ export const getBook = async (req, res) => {
   }
 
   try {
-    const book = await Book.findOne({ ibn });
+    const book = await Book.findOne({ ibn }).populate("reviews.user_id", "name username");
 
     if (book) {
       res.json({
@@ -136,6 +136,55 @@ export const getBook = async (req, res) => {
         message: "Book not found",
       });
     }
+  } catch (error) {
+    res.status(500).json({ status: false, error: error.message });
+  }
+};
+// POST /addreview
+export const addReview = async (req, res) => {
+  const { ibn, rating, comment } = req.body;
+  const user = req.user; // from protect middleware
+
+  if (!user) {
+    // Should be caught by middleware, but safety check
+    return res.status(401).json({ status: false, message: "Not authorized within controller" });
+  }
+
+  try {
+    const book = await Book.findOne({ ibn });
+
+    if (!book) {
+      return res.json({ status: false, message: "Book not found" });
+    }
+
+    const alreadyReviewed = book.reviews.find(
+      (r) => r.user_id.toString() === user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      alreadyReviewed.rating = Number(rating);
+      alreadyReviewed.comment = comment;
+      alreadyReviewed.date = Date.now();
+    } else {
+      const review = {
+        user_id: user._id,
+        rating: Number(rating),
+        comment,
+      };
+
+      book.reviews.push(review);
+    }
+
+    book.avg_rating =
+      book.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      book.reviews.length;
+
+    await book.save();
+
+    // Return updated book with populated details so frontend updates immediately
+    const updatedBook = await Book.findOne({ ibn }).populate("reviews.user_id", "name username");
+
+    res.status(201).json({ status: true, message: "Review added", data: updatedBook });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }
