@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema(
       completed: { type: Number, default: 0 },
       pagesRead: { type: Number, default: 0 },
     },
+    bookshelf: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
+
   },
   { timestamps: true }
 );

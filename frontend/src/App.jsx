@@ -11,6 +11,8 @@ import UserComponent from "./components/user";
 import AddBookPage from "./components/main/pages/addBook/index";
 import SearchPage from "./components/main/pages/search/index";
 import BookDetails from "./components/main/pages/book/index";
+import Shelf from "./components/main/pages/Shelf"; 
+
 
 // Protected Route - only accessible if logged in
 const ProtectedRoute = ({ children }) => {
@@ -82,6 +84,11 @@ function App() {
             <ProtectedRoute>
               <SearchPage />
             </ProtectedRoute>
+          } />
+          <Route path="/bookshelf" element={
+          <ProtectedRoute>
+            <Shelf />
+          </ProtectedRoute>
           } />
 
           {/* Book Details page */}
