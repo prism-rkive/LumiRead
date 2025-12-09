@@ -151,6 +151,13 @@ export default function HomePage() {
               className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             />
             <ActionButton
+              icon={LibraryBig}
+              label="My BookShelf"
+              onClick={() => handleNavigation("/bookshelf")}
+              className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
+            />
+
+            <ActionButton
               icon={Users}
               label="View Discussions"
               onClick={() => handleNavigation("/community/feed")}
