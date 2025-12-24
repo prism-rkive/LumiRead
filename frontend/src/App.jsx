@@ -12,6 +12,10 @@ import AddBookPage from "./components/main/pages/addBook/index";
 import SearchPage from "./components/main/pages/search/index";
 import BookDetails from "./components/main/pages/book/index";
 import Shelf from "./components/main/pages/Shelf"; 
+import ClubPage from "./components/main/pages/clubpage";
+import MyBookClubs from "./components/main/pages/MyBookClubs";
+import CreateClub from "./components/main/pages/CreateClub";//correct
+import AllBookClubs from "./components/main/pages/AllBookClubs";
 
 
 // Protected Route - only accessible if logged in
@@ -97,6 +101,40 @@ function App() {
               <BookDetails />
             </ProtectedRoute>
           } />
+        <Route path="/create-club"
+        element={
+          <ProtectedRoute>
+            <CreateClub/>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-clubs"
+        element={
+          <ProtectedRoute>
+            <MyBookClubs />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/clubs"
+        element={
+          <ProtectedRoute>
+            <AllBookClubs/>
+          </ProtectedRoute>
+        }
+       />
+
+
+      {/* Club Page */}
+      <Route
+        path="/club/:id"
+        element={
+          <ProtectedRoute>
+            <ClubPage />
+          </ProtectedRoute>
+        }
+      />
 
           {/* Redirect any unknown route */}
           <Route path="*" element={<Navigate to="/" replace />} />
