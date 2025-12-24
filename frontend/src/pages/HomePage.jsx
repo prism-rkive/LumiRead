@@ -156,6 +156,25 @@ export default function HomePage() {
               onClick={() => handleNavigation("/bookshelf")}
               className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             />
+             <ActionButton
+              icon={Club}
+              label="Create Book Club"
+              onClick={() => handleNavigation("/create-club")}
+              className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
+            />
+              <ActionButton
+              icon={Club}
+              label="My Book Clubs"
+              onClick={() => handleNavigation("/my-clubs")}
+              className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
+            />
+             <ActionButton
+              icon={List}
+              label="Search Book Clubs"
+              onClick={() => handleNavigation("/clubs")}
+              className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
+            />
+
 
             <ActionButton
               icon={Users}
