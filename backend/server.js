@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import path from "path";
 
 import userRoutes from "./routes/userRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
@@ -10,6 +11,8 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { protect } from "./middleware/authMiddleware.js";
 import { registerUser, authUser } from "./controllers/userController.js";
 import bookshelfRoutes from "./routes/bookshelfRoutes.js";
+import bookclubRoutes from "./routes/bookclubRoutes.js";
+import clubpostRoutes from "./routes/clubpostRoutes.js"
 
 
 dotenv.config();
@@ -37,6 +40,10 @@ app.use("/api/user", userRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/community", communityRoutes);
 app.use("/api/bookshelf", bookshelfRoutes);
+app.use("/api/bookclub", bookclubRoutes);
+app.use("/api/clubpost", clubpostRoutes);
+
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 
 // Legacy support for stale frontends
