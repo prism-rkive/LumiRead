@@ -9,6 +9,9 @@ import {
   Moon,
   Sun,
   Users,
+  LibraryBig,
+  Club,
+  List,
 } from "lucide-react";
 import ReadingOverview from "../components/ReadingOverview";
 import UserStats from "../components/UserStats";
@@ -107,10 +110,20 @@ export default function HomePage() {
           </button>
 
           <button
-            onClick={() => handleNavigation("/settings")}
-            className="p-3 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 text-red-700 dark:text-red-300 shadow-md transition-colors"
+            onClick={() => handleNavigation("/profile")}
+            className="p-1 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 text-red-700 dark:text-red-300 shadow-md transition-colors overflow-hidden flex items-center justify-center"
+            title="User Profile"
+            style={{ width: '44px', height: '44px' }}
           >
-            <Settings className="w-5 h-5" />
+            {user?.avatar ? (
+              <img
+                src={user.avatar.startsWith("http") ? user.avatar : `http://localhost:5000${user.avatar}`}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Users className="w-5 h-5" />
+            )}
           </button>
 
           <button
@@ -156,19 +169,19 @@ export default function HomePage() {
               onClick={() => handleNavigation("/bookshelf")}
               className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             />
-             <ActionButton
+            <ActionButton
               icon={Club}
               label="Create Book Club"
               onClick={() => handleNavigation("/create-club")}
               className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             />
-              <ActionButton
+            <ActionButton
               icon={Club}
               label="My Book Clubs"
               onClick={() => handleNavigation("/my-clubs")}
               className="flex-grow sm:flex-grow-0 min-w-[180px] bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             />
-             <ActionButton
+            <ActionButton
               icon={List}
               label="Search Book Clubs"
               onClick={() => handleNavigation("/clubs")}

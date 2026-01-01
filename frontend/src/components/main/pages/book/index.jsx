@@ -246,6 +246,41 @@ function BookDetails() {
             </div>
           </div>
 
+          {/* Community Reviews Section */}
+          <div className="community-reviews-section">
+            <h2 className="section-title">Community Reviews</h2>
+            <div className="reviews-list">
+              {book.reviews && book.reviews.length > 0 ? (
+                book.reviews
+                  .filter(r => (r.user_id?._id || r.user_id) !== currentUser._id)
+                  .map((review, index) => (
+                    <div key={index} className="community-review-item">
+                      <div className="review-user-info">
+                        <img
+                          src={review.user_id?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (review.user_id?.name || "User")}
+                          alt="User Avatar"
+                          className="review-user-avatar"
+                        />
+                        <div className="review-user-details">
+                          <span className="review-user-name">{review.user_id?.name || "Anonymous User"}</span>
+                          <div className="review-stars-display">
+                            {[...Array(5)].map((_, i) => (
+                              <span key={i} className={`star-display ${i < review.rating ? "filled" : ""}`}>★</span>
+                            ))}
+                          </div>
+                        </div>
+                        <span className="review-date-small">
+                          {new Date(review.date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="community-review-text">{review.comment || (<i>No written review.</i>)}</p>
+                    </div>
+                  ))
+              ) : (
+                <p className="no-reviews-msg">No community reviews yet. Be the first to share your thoughts!</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

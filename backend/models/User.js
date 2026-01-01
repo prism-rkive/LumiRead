@@ -27,7 +27,8 @@ const userSchema = new mongoose.Schema(
       pagesRead: { type: Number, default: 0 },
     },
     bookshelf: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
-
+    bio: { type: String, default: "" },
+    age: { type: Number },
   },
   { timestamps: true }
 );

@@ -13,6 +13,7 @@ import { registerUser, authUser } from "./controllers/userController.js";
 import bookshelfRoutes from "./routes/bookshelfRoutes.js";
 import bookclubRoutes from "./routes/bookclubRoutes.js";
 import clubpostRoutes from "./routes/clubpostRoutes.js"
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/api/community", communityRoutes);
 app.use("/api/bookshelf", bookshelfRoutes);
 app.use("/api/bookclub", bookclubRoutes);
 app.use("/api/clubpost", clubpostRoutes);
+app.use("/api/upload", uploadRoutes);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 

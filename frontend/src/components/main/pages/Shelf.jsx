@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import "./BookshelfPage.css"; // make sure this file exists
 
 // If you used lucide earlier, you can keep or replace with inline SVG. I will use inline SVG for portability.
 const BookIcon = () => (
   <svg width="36" height="36" viewBox="0 0 24 24" fill="#8C4A2F" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-    <path d="M6 4C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6ZM6 2H18C20.2091 2 22 3.79086 22 6V18C22 20.2091 20.2091 22 18 22H6C3.79086 22 2 20.2091 2 18V6C2 3.79086 3.79086 2 6 2ZM8 7H11V9H8V7ZM8 11H16V13H8V11ZM8 15H16V17H8V15Z"/>
+    <path d="M6 4C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6ZM6 2H18C20.2091 2 22 3.79086 22 6V18C22 20.2091 20.2091 22 18 22H6C3.79086 22 2 20.2091 2 18V6C2 3.79086 3.79086 2 6 2ZM8 7H11V9H8V7ZM8 11H16V13H8V11ZM8 15H16V17H8V15Z" />
   </svg>
 );
 
@@ -151,10 +152,12 @@ const BookshelfPage = () => {
             {bookshelf.length === 0 && <div className="no-results">Your bookshelf is empty.</div>}
 
             {bookshelf.map((book) => (
-              <div key={book._id} className="book-rect">
-                <img src={book.cover_img || "/default-cover.png"} alt={book.title} />
-                <div className="book-title">{book.title}</div>
-              </div>
+              <Link key={book._id} to={`/book/${book.ibn}`} className="book-rect-link">
+                <div className="book-rect">
+                  <img src={book.cover_img || "/default-cover.png"} alt={book.title} />
+                  <div className="book-title">{book.title}</div>
+                </div>
+              </Link>
             ))}
           </div>
         </section>
