@@ -36,13 +36,14 @@ export default function ProfilePage() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
-                if (res.data) {
+                if (res.data && res.data.status) {
+                    const userData = res.data.data;
                     setFormData({
-                        name: res.data.name || "",
-                        email: res.data.email || "",
-                        avatar: res.data.avatar || "",
-                        bio: res.data.bio || "",
-                        age: res.data.age || "",
+                        name: userData.name || "",
+                        email: userData.email || "",
+                        avatar: userData.avatar || "",
+                        bio: userData.bio || "",
+                        age: userData.age || "",
                     });
                 }
             } catch (err) {

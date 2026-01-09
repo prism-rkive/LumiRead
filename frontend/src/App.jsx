@@ -16,6 +16,8 @@ import MyBookClubs from "./components/main/pages/MyBookClubs";
 import CreateClub from "./components/main/pages/CreateClub";
 import AllBookClubs from "./components/main/pages/AllBookClubs";
 import ProfilePage from "./pages/ProfilePage";
+import DiscoverAuthors from "./components/main/pages/authors/DiscoverAuthors";
+import AuthorProfile from "./components/main/pages/authors/AuthorProfile";
 
 // Protected Route - only accessible if logged in
 const ProtectedRoute = ({ children }) => {
@@ -171,11 +173,31 @@ function App() {
             }
           />
 
+          {/* Discover Authors */}
+          <Route
+            path="/discover-authors"
+            element={
+              <ProtectedRoute>
+                <DiscoverAuthors />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Author Profile */}
+          <Route
+            path="/author/:name"
+            element={
+              <ProtectedRoute>
+                <AuthorProfile />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Redirect any unknown route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 

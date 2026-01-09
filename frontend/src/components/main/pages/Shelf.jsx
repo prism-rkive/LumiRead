@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BookOpen, Search, Plus, X, Trash2, AlertCircle } from "lucide-react";
 import Sidebar from "../../Sidebar";
 import "./BookshelfPage.css";
 
 const BookshelfPage = () => {
+  const navigate = useNavigate();
   const [bookshelf, setBookshelf] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -226,10 +228,15 @@ const BookshelfPage = () => {
                         src={book.cover_img || "/default-cover.png"}
                         alt={book.title}
                         className="book-cover"
+                        onClick={() => navigate(`/book/${book.ibn}`)}
+                        style={{ cursor: "pointer" }}
                       />
                       <button
                         className="remove-btn"
-                        onClick={() => removeFromShelf(book._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFromShelf(book._id);
+                        }}
                         title="Remove book"
                       >
                         <Trash2 size={16} />

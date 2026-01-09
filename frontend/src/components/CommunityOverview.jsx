@@ -19,6 +19,7 @@ export default function CommunityOverview({
   feed = [],
   onExpand,
   showViewAll = false,
+  onPostClick,
 }) {
   if (!feed.length) {
     return (
@@ -44,7 +45,8 @@ export default function CommunityOverview({
           return (
             <li
               key={post.id}
-              className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm"
+              className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              onClick={() => onPostClick && onPostClick(post.clubId)}
             >
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-gray-800 dark:text-gray-200">

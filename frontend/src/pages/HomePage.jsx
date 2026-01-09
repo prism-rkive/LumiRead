@@ -12,6 +12,7 @@ import {
   LibraryBig,
   Club,
   List,
+  User,
 } from "lucide-react";
 import ReadingOverview from "../components/ReadingOverview";
 import CommunityOverview from "../components/CommunityOverview";
@@ -66,6 +67,7 @@ export default function HomePage() {
           action: `posted in ${post.club?.name || "a club"}`,
           content: post.content, // ✅ Pass raw content
           clubName: post.club?.name,
+          clubId: post.club?._id,
           time: post.createdAt
             ? new Date(post.createdAt).toLocaleString()
             : "Unknown time",
@@ -156,7 +158,7 @@ export default function HomePage() {
                     : `http://localhost:5000${user.avatar}`
                 }
                 alt="Profile"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-full"
               />
             ) : (
               <Users className="w-5 h-5" />
@@ -194,7 +196,7 @@ export default function HomePage() {
           </div>
 
           {/* Grid layout for better alignment than flex-wrap */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <ActionButton
               className="w-full justify-center py-4 bg-red-50 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-none transition-transform active:scale-95"
               icon={BookPlus}
@@ -220,6 +222,12 @@ export default function HomePage() {
               label="My Book Clubs"
               onClick={() => handleNavigation("/my-clubs")}
             />
+            <ActionButton
+              className="w-full justify-center py-4 bg-red-50 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-none transition-transform active:scale-95"
+              icon={User}
+              label="Discover Authors"
+              onClick={() => handleNavigation("/discover-authors")}
+            />
           </div>
         </div>
         {/* Overview Grid - Expanded like Quick Actions */}
@@ -240,6 +248,9 @@ export default function HomePage() {
               <CommunityOverview
                 feed={feed}
                 onExpand={() => handleNavigation("/my-clubs")}
+                onPostClick={(clubId) => {
+                  if (clubId) handleNavigation(`/club/${clubId}`);
+                }}
                 showViewAll={true}
               />
             </div>

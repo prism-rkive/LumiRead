@@ -10,6 +10,7 @@ import {
   ChevronRight,
   LibraryBig,
   BookPlus,
+  User,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -23,6 +24,7 @@ const Sidebar = () => {
     { name: "Add Books", path: "/addbook", icon: BookPlus },
     { name: "Search Clubs", path: "/clubs", icon: Search },
     { name: "My Clubs", path: "/my-clubs", icon: Users },
+    { name: "Discover Authors", path: "/discover-authors", icon: User },
     { name: "Create Club", path: "/create-club", icon: PlusCircle },
   ];
 
@@ -39,9 +41,8 @@ const Sidebar = () => {
 
       {/* Sidebar Panel */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-gray-900 shadow-2xl transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-500 ease-out z-40 border-r border-gray-100 dark:border-gray-800`}
+        className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-gray-900 shadow-2xl transform ${isOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-500 ease-out z-40 border-r border-gray-100 dark:border-gray-800`}
       >
         <div className="flex flex-col h-full pt-24 px-6 pb-8">
           <div className="mb-10 px-2">
@@ -61,11 +62,10 @@ const Sidebar = () => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center justify-between p-4 rounded-2xl transition-all group ${
-                    isActive
-                      ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
-                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600"
-                  }`}
+                  className={`flex items-center justify-between p-4 rounded-2xl transition-all group ${isActive
+                    ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600"
+                    }`}
                 >
                   <div className="flex items-center gap-4">
                     <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
@@ -75,11 +75,10 @@ const Sidebar = () => {
                   </div>
                   <ChevronRight
                     size={16}
-                    className={`transition-transform ${
-                      isActive
-                        ? "opacity-100"
-                        : "opacity-0 group-hover:opacity-100"
-                    }`}
+                    className={`transition-transform ${isActive
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100"
+                      }`}
                   />
                 </Link>
               );
