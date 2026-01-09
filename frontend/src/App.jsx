@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Homepage from "./pages/HomePage";
 import LandingPage from "./pages/LandingPage";
-import CommunityFeed from "./pages/CommunityFeed";
 import Filter from "./components/main/filter";
 import Header from "./components/main/header";
 import UserComponent from "./components/user";
@@ -90,12 +89,6 @@ function App() {
                 <ProfilePage />
               </ProtectedRoute>
             }
-          />
-
-          {/* Community Feed */}
-          <Route
-            path="/community"
-            element={<CommunityFeed theme={theme} toggleTheme={toggleTheme} />}
           />
 
           {/* Add Book page */}

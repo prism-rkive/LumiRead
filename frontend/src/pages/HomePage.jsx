@@ -14,7 +14,6 @@ import {
   List,
 } from "lucide-react";
 import ReadingOverview from "../components/ReadingOverview";
-import UserStats from "../components/UserStats";
 import CommunityOverview from "../components/CommunityOverview";
 import ActionButton from "../components/ActionButton";
 import Footer from "../components/Footer"; // ✅ Import your Footer component
