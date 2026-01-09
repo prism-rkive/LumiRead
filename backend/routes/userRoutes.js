@@ -1,9 +1,12 @@
+console.log("🔥 attaching /api/user routes");
+
+console.log("✅ userRoutes file loaded");
 import express from "express";
 import {
-    getUserProfile,
-    registerUser,
-    authUser,
-    isAuthed,
+  getUserProfile,
+  registerUser,
+  authUser,
+  isAuthed,
 } from "../controllers/userController.js";
 
 import { protect } from "../middleware/authMiddleware.js";

@@ -11,22 +11,21 @@ import UserComponent from "./components/user";
 import AddBookPage from "./components/main/pages/addBook/index";
 import SearchPage from "./components/main/pages/search/index";
 import BookDetails from "./components/main/pages/book/index";
-import Shelf from "./components/main/pages/Shelf"; 
+import Shelf from "./components/main/pages/Shelf";
 import ClubPage from "./components/main/pages/clubpage";
 import MyBookClubs from "./components/main/pages/MyBookClubs";
-import CreateClub from "./components/main/pages/CreateClub";//correct
+import CreateClub from "./components/main/pages/CreateClub"; //correct
 import AllBookClubs from "./components/main/pages/AllBookClubs";
-
-
+import ProfilePage from "./pages/ProfilePage";
 // Protected Route - only accessible if logged in
 const ProtectedRoute = ({ children }) => {
-  const user = localStorage.getItem('currentUser');
+  const user = localStorage.getItem("currentUser");
   return user ? children : <Navigate to="/" />;
 };
 
 // Public Route - redirects to /home if already logged in
 const PublicRoute = ({ children }) => {
-  const user = localStorage.getItem('currentUser');
+  const user = localStorage.getItem("currentUser");
   return user ? <Navigate to="/home" /> : children;
 };
 
@@ -54,87 +53,118 @@ function App() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors App">
         <Routes>
           {/* Public Landing Page */}
-          <Route path="/" element={
-            <PublicRoute>
-              <LandingPage />
-            </PublicRoute>
-          } />
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <LandingPage />
+              </PublicRoute>
+            }
+          />
 
           {/* Login/Register page */}
-          <Route path="/login" element={
-            <PublicRoute>
-              <UserComponent />
-            </PublicRoute>
-          } />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <UserComponent />
+              </PublicRoute>
+            }
+          />
 
           {/* Homepage - PROTECTED */}
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <Homepage theme={theme} toggleTheme={toggleTheme} />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/community" element={<CommunityFeed theme={theme} toggleTheme={toggleTheme} />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Homepage theme={theme} toggleTheme={toggleTheme} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/community"
+            element={<CommunityFeed theme={theme} toggleTheme={toggleTheme} />}
+          />
 
           {/* Add Book page */}
-          <Route path="/addbook" element={
-            <ProtectedRoute>
-              <AddBookPage />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/addbook"
+            element={
+              <ProtectedRoute>
+                <AddBookPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Search page */}
-          <Route path="/search" element={
-            <ProtectedRoute>
-              <SearchPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/bookshelf" element={
-          <ProtectedRoute>
-            <Shelf />
-          </ProtectedRoute>
-          } />
+          <Route
+            path="/search"
+            element={
+              <ProtectedRoute>
+                <SearchPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bookshelf"
+            element={
+              <ProtectedRoute>
+                <Shelf />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Book Details page */}
-          <Route path="/book/:ibn" element={
-            <ProtectedRoute>
-              <BookDetails />
-            </ProtectedRoute>
-          } />
-        <Route path="/create-club"
-        element={
-          <ProtectedRoute>
-            <CreateClub/>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-clubs"
-        element={
-          <ProtectedRoute>
-            <MyBookClubs />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/clubs"
-        element={
-          <ProtectedRoute>
-            <AllBookClubs/>
-          </ProtectedRoute>
-        }
-       />
+          <Route
+            path="/book/:isbn"
+            element={
+              <ProtectedRoute>
+                <BookDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-club"
+            element={
+              <ProtectedRoute>
+                <CreateClub />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-clubs"
+            element={
+              <ProtectedRoute>
+                <MyBookClubs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clubs"
+            element={
+              <ProtectedRoute>
+                <AllBookClubs />
+              </ProtectedRoute>
+            }
+          />
 
-
-      {/* Club Page */}
-      <Route
-        path="/club/:id"
-        element={
-          <ProtectedRoute>
-            <ClubPage />
-          </ProtectedRoute>
-        }
-      />
+          {/* Club Page */}
+          <Route
+            path="/club/:id"
+            element={
+              <ProtectedRoute>
+                <ClubPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Redirect any unknown route */}
           <Route path="*" element={<Navigate to="/" replace />} />

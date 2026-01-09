@@ -1,101 +1,374 @@
-import React, { useState } from "react";
-import api from "../../../../service/api";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./style.css";
+import {
+  Search,
+  Star,
+  BookOpen,
+  AlertCircle,
+  TrendingUp,
+  Sparkles,
+  Filter,
+  X,
+} from "lucide-react";
+import Sidebar from "../../../Sidebar";
 
 function SearchPage() {
+  const navigate = useNavigate();
+
   const [query, setQuery] = useState("");
-  const [data, setData] = useState(null);
+  const [selectedGenre, setSelectedGenre] = useState("all");
+  const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const [trendingBooks, setTrendingBooks] = useState([]);
+  const [mostReadBooks, setMostReadBooks] = useState([]);
+  const [newReleases, setNewReleases] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [searched, setSearched] = useState(false);
+
+  const genres = [
+    "all",
+    "fiction",
+    "mystery",
+    "romance",
+    "science fiction",
+    "fantasy",
+    "thriller",
+    "horror",
+    "biography",
+    "history",
+    "self-help",
+    "business",
+    "poetry",
+  ];
+
+  useEffect(() => {
+    fetchInitialBooks();
+  }, []);
+
+  // Auto-search when filters change (if already searched)
+  useEffect(() => {
+    if (searched) {
+      const timer = setTimeout(() => {
+        handleSearchWithoutEvent();
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [selectedGenre, selectedAuthor]);
+
+  const fetchInitialBooks = async () => {
+    setInitialLoading(true);
+    try {
+      const [trending, mostRead, newBooks] = await Promise.all([
+        axios.get(
+          `https://www.googleapis.com/books/v1/volumes?q=subject:fiction&orderBy=relevance&maxResults=12`
+        ),
+        axios.get(
+          `https://www.googleapis.com/books/v1/volumes?q=bestseller&orderBy=relevance&maxResults=40`
+        ),
+        axios.get(
+          `https://www.googleapis.com/books/v1/volumes?q=subject:thriller&orderBy=newest&maxResults=12`
+        ),
+      ]);
+
+      const filterValidBooks = (items) =>
+        (items || []).filter(
+          (book) =>
+            book.volumeInfo &&
+            book.volumeInfo.title &&
+            book.volumeInfo.imageLinks?.thumbnail
+        );
+
+      setTrendingBooks(filterValidBooks(trending.data.items));
+      setMostReadBooks(filterValidBooks(mostRead.data.items));
+      setNewReleases(filterValidBooks(newBooks.data.items));
+    } catch (error) {
+      console.error("Error fetching books:", error);
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  const handleSearchWithoutEvent = async () => {
+    setLoading(true);
+    setSearched(true);
+
+    try {
+      let searchQuery = "";
+
+      if (query.trim()) {
+        searchQuery = query.trim();
+      } else {
+        if (selectedGenre !== "all") {
+          searchQuery = `subject:${selectedGenre}`;
+        } else {
+          searchQuery = "books";
+        }
+      }
+
+      if (selectedGenre !== "all" && query.trim()) {
+        searchQuery += ` subject:${selectedGenre}`;
+      }
+
+      if (selectedAuthor.trim()) {
+        searchQuery += ` inauthor:${selectedAuthor}`;
+      }
+
+      const response = await axios.get(
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+          searchQuery
+        )}&maxResults=40`
+      );
+
+      setSearchResults(
+        (response.data.items || []).filter(
+          (book) =>
+            book.volumeInfo &&
+            book.volumeInfo.title &&
+            book.volumeInfo.imageLinks?.thumbnail
+        )
+      );
+    } catch (error) {
+      console.error("Error searching books:", error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
-
-    setLoading(true);
-    setSearched(true);
-    try {
-      const res = await api.post("/search", { query });
-      if (res.data) {
-        setData(res.data);
-      }
-    } catch (e) {
-      console.error(e);
-      setData({ status: false });
-    }
-    setLoading(false);
+    await handleSearchWithoutEvent();
   };
+
+  const clearSearch = () => {
+    setQuery("");
+    setSearched(false);
+    setSearchResults([]);
+    setSelectedGenre("all");
+    setSelectedAuthor("");
+  };
+
+  const handleBookClick = (book) => {
+    const isbn =
+      book.volumeInfo.industryIdentifiers?.[0]?.identifier || book.id;
+    navigate(`/book/${isbn}`, { state: { bookData: book } });
+  };
+
+  const handleViewAll = (genreQuery) => {
+    setQuery("");
+    setSelectedGenre(genreQuery);
+    setSelectedAuthor("");
+    setSearched(true);
+    handleSearchWithoutEvent();
+  };
+
+  const BookCard = ({ book }) => {
+    const info = book.volumeInfo;
+    return (
+      <div className="explore-book-card" onClick={() => handleBookClick(book)}>
+        <div className="explore-book-cover">
+          <img
+            src={
+              info.imageLinks?.thumbnail ||
+              "https://via.placeholder.com/128x192?text=No+Cover"
+            }
+            alt={info.title}
+          />
+        </div>
+        <div className="explore-book-info">
+          <h3 className="explore-book-title">{info.title}</h3>
+          <p className="explore-book-author">
+            {info.authors?.[0] || "Unknown Author"}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const BookSection = ({ title, icon, books, onViewAll }) => (
+    <div className="book-section">
+      <div className="section-header-explore">
+        <div className="section-title-wrapper">
+          {icon}
+          <h2>{title}</h2>
+        </div>
+        <button className="view-all-btn" onClick={onViewAll}>
+          VIEW ALL →
+        </button>
+      </div>
+      <div className="books-grid-explore">
+        {books.slice(0, 12).map((book) => (
+          <BookCard key={book.id} book={book} />
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="search-page">
-      <div className="search-content-wrapper">
-        <div className="search-header">
-          <div className="icon-circle">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" stroke="#8B4513" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <h1>Search Books</h1>
-          <p className="subtitle">Find your next favorite read by title</p>
-        </div>
+      <Sidebar />
+      <div className="search-content">
+        <div className="search-container">
+          {/* Header Section */}
+          <div className="search-header">
+            <h1>
+              Explore <span className="highlight">Books</span>
+            </h1>
+            <p className="subtitle">
+              Discover thousands of books from around the world
+            </p>
 
-        <div className="search-section card">
-          <label>Book Title</label>
-          <p className="helper-text">Enter the name of the book you are looking for</p>
-          <form onSubmit={handleSearch} className="search-input-group">
-            <input
-              type="text"
-              value={query}
-              placeholder="e.g. The Great Gatsby"
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <button
-              className="search-btn"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? "Searching..." : (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                  Search
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-
-        <div className="results-section">
-          {searched && (
-            <>
-              {data && data.status && data.data.length > 0 ? (
-                data.data.map((book, index) => (
-                  <a href={"/book/" + book.ibn} key={index} className="book-tile">
-                    <img src={book.cover_img || "/dummy.jpg"} alt={book.title} />
-                    <div className="book-details">
-                      <div className="book-overview">
-                        <div className="book-name">
-                          <h2>{book.title}</h2>
-                          <b>{book.author}</b>
-                        </div>
-                        <div className="book-rating">
-                          <h2>{book.avg_rating || 0}</h2>
-                          <b>({book.reviews ? book.reviews.length : 0})</b>
-                        </div>
-                      </div>
-                      <p className="book-description">
-                        <b>Description:</b> <br />
-                        {book.description}
-                      </p>
-                    </div>
-                  </a>
-                ))
-              ) : (
-                <div className="no-results card">
-                  <p>{loading ? "Searching..." : "No books found matching your query."}</p>
+            {/* Search Bar */}
+            <form onSubmit={handleSearch}>
+              <div className="search-bar-wrapper">
+                <div className="search-input-group">
+                  <Search className="search-icon-main" size={20} />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search thousands of titles..."
+                    className="search-input-main"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      className="clear-btn"
+                      onClick={clearSearch}
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
                 </div>
+                <button
+                  type="button"
+                  className="filter-toggle-btn"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  <Filter size={18} />
+                  Filters
+                </button>
+                <button
+                  type="submit"
+                  className="search-btn-main"
+                  disabled={loading}
+                >
+                  {loading ? "Searching..." : "Explore"}
+                </button>
+              </div>
+            </form>
+
+            {/* Filters */}
+            {showFilters && (
+              <div className="filters-panel">
+                <div className="filter-group">
+                  <label>Genre</label>
+                  <select
+                    value={selectedGenre}
+                    onChange={(e) => setSelectedGenre(e.target.value)}
+                    className="filter-select"
+                  >
+                    {genres.map((genre) => (
+                      <option key={genre} value={genre}>
+                        {genre.charAt(0).toUpperCase() + genre.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="filter-group">
+                  <label>Author</label>
+                  <input
+                    type="text"
+                    value={selectedAuthor}
+                    onChange={(e) => setSelectedAuthor(e.target.value)}
+                    placeholder="Filter by author name..."
+                    className="filter-input"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Search Results */}
+          {searched && (
+            <div className="search-results-section">
+              <button
+                className="back-to-main-btn"
+                onClick={() => setSearched(false)}
+              >
+                ← Back to Explore
+              </button>
+
+              <div className="results-header">
+                <div className="section-title-wrapper">
+                  <Search size={24} />
+                  <h2>Search Results</h2>
+                </div>
+                <span className="results-count">
+                  {searchResults.length} books found
+                </span>
+              </div>
+
+              {loading ? (
+                <div className="loading-state">
+                  <div className="spinner-large"></div>
+                  <p>Searching...</p>
+                </div>
+              ) : searchResults.length > 0 ? (
+                <div className="books-grid-explore">
+                  {searchResults.map((book) => (
+                    <BookCard key={book.id} book={book} />
+                  ))}
+                </div>
+              ) : (
+                <div className="no-results-card">
+                  <AlertCircle size={48} />
+                  <h3>No books found</h3>
+                  <p>Try adjusting your search terms or filters</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Book Collections - Show only when not searching */}
+          {!searched && (
+            <>
+              {initialLoading ? (
+                <div className="loading-state">
+                  <div className="spinner-large"></div>
+                  <p>Loading books...</p>
+                </div>
+              ) : (
+                <>
+                  <BookSection
+                    title="Trending Now"
+                    icon={<TrendingUp size={24} />}
+                    books={trendingBooks}
+                    onViewAll={() => handleViewAll("fiction")}
+                  />
+
+                  <BookSection
+                    title="Most Read"
+                    icon={<Star size={24} />}
+                    books={mostReadBooks}
+                    onViewAll={() => handleViewAll("bestseller")}
+                  />
+
+                  <BookSection
+                    title="New Releases"
+                    icon={<Sparkles size={24} />}
+                    books={newReleases}
+                    onViewAll={() => handleViewAll("thriller")}
+                  />
+                </>
               )}
             </>
           )}

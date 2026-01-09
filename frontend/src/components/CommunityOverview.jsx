@@ -1,54 +1,77 @@
-// src/components/CommunityOverview.jsx (Corrected)
+// src/components/CommunityOverview.jsx
 import React from "react";
-import { User } from "lucide-react";
 
-const CommunityOverview = ({ feed = [], onExpand }) => (
-  <div className="p-6 bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-xl transition-colors">
-    {" "}
-    {/* Removed h-full */}   {" "}
-    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-            <User className="w-6 h-6 mr-2 text-red-700" /> Community Snap    {" "}
-    </h2>
-       {" "}
-    <ul className="space-y-3">
-           {" "}
-      {feed.slice(0, 3).map((item) => (
-        <li
-          key={item.id}
-          className="flex items-start p-3 bg-white dark:bg-gray-700 rounded-xl hover:bg-red-50 dark:hover:bg-gray-700/70 transition-colors border border-gray-200 dark:border-gray-700/50"
+// Helper function to strip HTML tags and get plain text
+const stripHtmlTags = (html) => {
+  if (!html) return "";
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || "";
+};
+
+// Helper function to truncate text
+const truncateText = (text, maxLength = 200) => {
+  if (!text || text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + "...";
+};
+
+export default function CommunityOverview({
+  feed = [],
+  onExpand,
+  showViewAll = false,
+}) {
+  if (!feed.length) {
+    return (
+      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          Community Feed
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400">No posts yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-lg">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        Community Feed
+      </h3>
+      <ul className="space-y-4">
+        {feed.map((post) => {
+          const plainTextContent = stripHtmlTags(post.content);
+          const displayContent = truncateText(plainTextContent, 200);
+
+          return (
+            <li
+              key={post.id}
+              className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-gray-800 dark:text-gray-200">
+                  {post.user}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {post.time}
+                </span>
+              </div>
+              <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {displayContent}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                {post.action}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {showViewAll && (
+        <button
+          className="mt-4 w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+          onClick={onExpand}
         >
-                   {" "}
-          <User className="w-5 h-5 mr-3 text-red-600 flex-shrink-0 mt-1" />     
-             {" "}
-          <div>
-                       {" "}
-            <span className="font-semibold text-gray-900 dark:text-white">
-                            {item.user}           {" "}
-            </span>{" "}
-                       {" "}
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {item.action}           {" "}
-            </span>
-                       {" "}
-            <p className="text-xs text-red-500 dark:text-red-400 mt-0.5">
-                            {item.time}           {" "}
-            </p>
-                     {" "}
-          </div>
-                 {" "}
-        </li>
-      ))}
-         {" "}
-    </ul>
-       {" "}
-    <button
-      onClick={onExpand}
-      className="w-full py-3 border border-red-400 text-red-700 dark:text-red-400 dark:border-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-gray-700 transition-colors font-semibold mt-6"
-    >
-            View Full Community Feed    {" "}
-    </button>
-     {" "}
-  </div>
-);
-
-export default CommunityOverview;
+          View All
+        </button>
+      )}
+    </div>
+  );
+}

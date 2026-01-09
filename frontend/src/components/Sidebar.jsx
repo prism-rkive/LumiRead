@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  Menu, 
-  X, 
-  Home, 
-  Search, 
-  Users, 
-  PlusCircle, 
-  ChevronRight 
+import {
+  Menu,
+  X,
+  Home,
+  Search,
+  Users,
+  PlusCircle,
+  ChevronRight,
+  LibraryBig,
+  BookPlus,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -16,6 +18,9 @@ const Sidebar = () => {
 
   const menuItems = [
     { name: "Home", path: "/", icon: Home },
+    { name: "Search Books", path: "/search", icon: Search },
+    { name: "My Bookshelf", path: "/bookshelf", icon: LibraryBig },
+    { name: "Add Books", path: "/addbook", icon: BookPlus },
     { name: "Search Clubs", path: "/clubs", icon: Search },
     { name: "My Clubs", path: "/my-clubs", icon: Users },
     { name: "Create Club", path: "/create-club", icon: PlusCircle },
@@ -40,8 +45,12 @@ const Sidebar = () => {
       >
         <div className="flex flex-col h-full pt-24 px-6 pb-8">
           <div className="mb-10 px-2">
-            <h2 className="text-2xl font-black text-red-700 dark:text-red-400">LumiRead</h2>
-            <p className="text-xs text-gray-400 font-medium tracking-widest uppercase mt-1">Navigation</p>
+            <h2 className="text-2xl font-black text-red-700 dark:text-red-400">
+              LumiRead
+            </h2>
+            <p className="text-xs text-gray-400 font-medium tracking-widest uppercase mt-1">
+              Navigation
+            </p>
           </div>
 
           <nav className="flex-1 space-y-2">
@@ -53,16 +62,25 @@ const Sidebar = () => {
                   to={item.path}
                   onClick={() => setIsOpen(false)}
                   className={`flex items-center justify-between p-4 rounded-2xl transition-all group ${
-                    isActive 
-                    ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400" 
-                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600"
+                    isActive
+                      ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600"
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-                    <span className="font-bold text-sm tracking-wide">{item.name}</span>
+                    <span className="font-bold text-sm tracking-wide">
+                      {item.name}
+                    </span>
                   </div>
-                  <ChevronRight size={16} className={`transition-transform ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
+                  <ChevronRight
+                    size={16}
+                    className={`transition-transform ${
+                      isActive
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  />
                 </Link>
               );
             })}

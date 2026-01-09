@@ -16,26 +16,10 @@ export const registerUser = async (req, res) => {
   const { name, email, password, username, number } = req.body;
 
   if (!name || !password || !username) {
-    return res.json({ status: false, type: "empty" }); // Legacy behavior
+    return res.json({ status: false, type: "empty" });
   }
 
-  // Note: Email is new, so we handle it gracefully or skip if not in legacy form, 
-  // but let's keep it required as per new model. 
-  // If legacy frontend doesn't send email, we might have an issue. 
-  // Wait, frontend doesn't seem to send email!
-  // Checks:
-  // if (name === "") ... 
-  // if (number === "") ...
-  // if (password !== password2) ...
-  // api.post("/register", { name, number, username, password });
-
-  // Frontend DOES NOT SEND EMAIL.
-  // We need to generate a dummy email or make it optional in model.
-  // For now, let's generate one or make it optional.
-  // Since User model has `email: { type: String, required: true, unique: true }`, this will fail.
-
-  // I MUST FIX THE MODEL or generate an email.
-  const generatedEmail = email || `${username}@example.com`; // Fallback
+  const generatedEmail = email || `${username}@example.com`;
 
   // Check if username exists
   const usernameExists = await User.findOne({ username });
@@ -72,17 +56,13 @@ export const registerUser = async (req, res) => {
         email: user.email,
         username: user.username,
         token: generateToken(user._id),
-        status: true, // Legacy success flag
+        status: true,
       });
     } else {
       res.json({ status: false, message: "Invalid user data" });
     }
   } catch (error) {
-    // Check for email duplicate if we generated one that exists
     if (error.code === 11000 && error.keyPattern.email) {
-      // Try again with random? existing logic allows dup emails if we just fake it. 
-      // Realistically we should ask user for email, but legacy doesn't have it.
-      // I will return a generic error.
       res.status(500).json({ status: false, error: error.message });
     } else {
       res.status(500).json({ status: false, error: error.message });
@@ -109,13 +89,12 @@ export const authUser = async (req, res) => {
       email: user.email,
       username: user.username,
       token: generateToken(user._id),
-      // legacy support
       status: true,
       user: {
         id: user._id,
         name: user.name,
-        username: user.username
-      }
+        username: user.username,
+      },
     });
   } else {
     res.status(400);
@@ -123,22 +102,28 @@ export const authUser = async (req, res) => {
   }
 };
 
-// GET /api/user/me
+// @desc    Get user profile
+// @route   GET /api/user/me
+// @access  Private
 export const getUserProfile = async (req, res) => {
-  // Use the user attached by the 'protect' middleware
   const user = req.user;
 
   if (!user) {
-    res.status(404);
-    throw new Error("User not found");
+    return res.status(404).json({
+      status: false,
+      message: "User not found",
+    });
   }
 
   res.json({
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    avatar: user.avatar,
-    readingGoals: user.readingGoals,
+    status: true,
+    data: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      readingGoals: user.readingGoals,
+    },
   });
 };
 

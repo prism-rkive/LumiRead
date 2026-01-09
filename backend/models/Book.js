@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema(
   {
-    userId: { // Keeping this for the new architecture, but aliasing to added_by for legacy if needed
+    userId: {
+      // Keeping this for the new architecture, but aliasing to added_by for legacy if needed
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
@@ -20,7 +21,7 @@ const bookSchema = new mongoose.Schema(
         user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         rating: { type: Number, default: 0 },
         comment: { type: String },
-        date: { type: Date, default: Date.now }
+        date: { type: Date, default: Date.now },
       },
     ],
     avg_rating: { type: Number, default: 0 },

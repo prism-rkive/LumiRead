@@ -11,8 +11,7 @@
 /* Left Side - Background Image */
 .auth-left {
   flex: 0 0 40%;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url('C:\Users\Asus\New folder (2)\LumiRead\frontend\public\back.jpg');
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -197,7 +196,7 @@
   .auth-left {
     flex: 0 0 40%;
   }
-  
+
   .auth-right {
     flex: 0 0 60%;
   }

@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./BookshelfPage.css"; // make sure this file exists
-
-// If you used lucide earlier, you can keep or replace with inline SVG. I will use inline SVG for portability.
-const BookIcon = () => (
-  <svg width="36" height="36" viewBox="0 0 24 24" fill="#8C4A2F" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-    <path d="M6 4C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6ZM6 2H18C20.2091 2 22 3.79086 22 6V18C22 20.2091 20.2091 22 18 22H6C3.79086 22 2 20.2091 2 18V6C2 3.79086 3.79086 2 6 2ZM8 7H11V9H8V7ZM8 11H16V13H8V11ZM8 15H16V17H8V15Z"/>
-  </svg>
-);
+import { BookOpen, Search, Plus, X, Trash2, AlertCircle } from "lucide-react";
+import Sidebar from "../../Sidebar";
+import "./BookshelfPage.css";
 
 const BookshelfPage = () => {
   const [bookshelf, setBookshelf] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const getToken = () => {
     const stored = JSON.parse(localStorage.getItem("currentUser"));
@@ -32,6 +29,7 @@ const BookshelfPage = () => {
       if (data.status) setBookshelf(data.data);
     } catch (err) {
       console.error(err);
+      setError("Failed to load bookshelf");
     }
   };
 
@@ -40,16 +38,23 @@ const BookshelfPage = () => {
   }, []);
 
   const handleSearch = async () => {
-    if (!searchQuery) return;
+    if (!searchQuery.trim()) return;
+    setLoading(true);
+    setError("");
     try {
       const token = getToken();
       const { data } = await axios.get(
-        `http://localhost:5000/api/bookshelf/search?title=${encodeURIComponent(searchQuery)}`,
+        `http://localhost:5000/api/bookshelf/search?title=${encodeURIComponent(
+          searchQuery
+        )}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.status) setSearchResults(data.data);
     } catch (err) {
       console.error(err);
+      setError("Failed to search books");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,97 +72,179 @@ const BookshelfPage = () => {
       }
     } catch (err) {
       console.error(err);
+      setError("Failed to add book");
+    }
+  };
+
+  const removeFromShelf = async (bookId) => {
+    if (!window.confirm("Remove this book from your shelf?")) return;
+    try {
+      const token = getToken();
+      const { data } = await axios.delete(
+        `http://localhost:5000/api/bookshelf/${bookId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.status) {
+        setBookshelf((prev) => prev.filter((book) => book._id !== bookId));
+        setError("");
+      } else {
+        setError(data.message || "Failed to remove book");
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Failed to remove book");
     }
   };
 
   return (
-    <div className="search-page">
-      <div className="search-content-wrapper">
-        <header className="search-header">
-          <div className="icon-circle">
-            <BookIcon />
-          </div>
-          <h1>My Bookshelf</h1>
-          <p className="subtitle">Your curated library — organized beautifully.</p>
+    <div className="bookshelf-page">
+      <Sidebar />
 
-          <button
-            className="search-toggle-btn"
-            onClick={() => setShowSearch((p) => !p)}
-            aria-expanded={showSearch}
-          >
-            {showSearch ? "Close" : "Add Book"}
-          </button>
-        </header>
+      <div className="bookshelf-content">
+        <div className="bookshelf-container">
+          {/* Header Section */}
+          <div className="bookshelf-header">
+            <h1>
+              My <span className="highlight">Bookshelf</span>
+            </h1>
+            <p className="subtitle">
+              Your curated library — organized beautifully.
+            </p>
 
-        {showSearch && (
-          <section className="card search-section" aria-label="Search books">
-            <label htmlFor="book-search">Search by title</label>
-            <p className="helper-text">Type a book title and click Search</p>
-
-            <div className="search-input-group" role="search">
-              <input
-                id="book-search"
-                type="text"
-                placeholder="Search by title..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
-              />
-              <button className="search-btn" onClick={handleSearch}>Search</button>
-            </div>
-
-            {/* Vertical list of results (stacked book-tile items) */}
-            <div className="results-section" aria-live="polite">
-              {searchResults.length === 0 && (
-                <div className="no-results">No results yet.</div>
+            <button
+              className="toggle-search-btn"
+              onClick={() => setShowSearch((p) => !p)}
+            >
+              {showSearch ? (
+                <>
+                  <X size={20} /> Close Search
+                </>
+              ) : (
+                <>
+                  <Plus size={20} /> Add Book
+                </>
               )}
-
-
-              {searchResults.map((book) => (
-                <a key={book._id} className="search-card" href="#!" onClick={(e) => e.preventDefault()}>
-                  <img src={book.cover_img || "/default-cover.png"} alt={book.title} />
-                  <div className="book-details">
-                    <div className="book-overview">
-                      <div className="book-name">
-                        <h2>{book.title}</h2>
-                        <div className="book-meta">
-                          <span className="author">{book.author}</span>
-                          {book.year && <span className="year"> • {book.year}</span>}
-                        </div>
-                      </div>
-
-                      <div className="book-rating">
-                        <button
-                          className="search-add-btn"
-                          onClick={(e) => { e.preventDefault(); addToShelf(book.ibn); }}
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </div>
-
-                  </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Bookshelf grid with portrait book rectangles */}
-        <section className="card">
-          <h2 className="section-title">Your Collection</h2>
-
-          <div className="bookshelf-grid">
-            {bookshelf.length === 0 && <div className="no-results">Your bookshelf is empty.</div>}
-
-            {bookshelf.map((book) => (
-              <div key={book._id} className="book-rect">
-                <img src={book.cover_img || "/default-cover.png"} alt={book.title} />
-                <div className="book-title">{book.title}</div>
-              </div>
-            ))}
+            </button>
           </div>
-        </section>
+
+          {error && (
+            <div className="error-alert">
+              <AlertCircle size={20} />
+              <p>{error}</p>
+            </div>
+          )}
+
+          {/* Search Section */}
+          {showSearch && (
+            <div className="search-card">
+              <div className="search-card-header">
+                <Search size={20} />
+                <h2>Search Books</h2>
+              </div>
+
+              <div className="search-input-wrapper">
+                <input
+                  type="text"
+                  placeholder="Search by title..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch();
+                  }}
+                  className="search-input"
+                />
+                <button
+                  className="search-btn"
+                  onClick={handleSearch}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="spinner" />
+                  ) : (
+                    <>
+                      <Search size={18} /> Search
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Search Results */}
+              <div className="search-results">
+                {searchResults.length === 0 && searchQuery && !loading && (
+                  <div className="no-results">No results found</div>
+                )}
+
+                {searchResults.map((book) => (
+                  <div key={book._id} className="result-item">
+                    <img
+                      src={book.cover_img || "/default-cover.png"}
+                      alt={book.title}
+                      className="result-cover"
+                    />
+                    <div className="result-details">
+                      <h3>{book.title}</h3>
+                      <p className="result-author">{book.author}</p>
+                      {book.year && <p className="result-year">{book.year}</p>}
+                    </div>
+                    <button
+                      className="add-btn"
+                      onClick={() => addToShelf(book.ibn)}
+                    >
+                      <Plus size={18} /> Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Bookshelf Collection */}
+          <div className="collection-section">
+            <div className="collection-header">
+              <BookOpen size={24} />
+              <h2>Your Collection</h2>
+              <span className="book-count">{bookshelf.length} books</span>
+            </div>
+
+            {bookshelf.length === 0 ? (
+              <div className="empty-state">
+                <BookOpen size={48} />
+                <p>Your bookshelf is empty</p>
+                <button
+                  className="empty-state-btn"
+                  onClick={() => setShowSearch(true)}
+                >
+                  <Plus size={18} /> Add Your First Book
+                </button>
+              </div>
+            ) : (
+              <div className="bookshelf-grid">
+                {bookshelf.map((book) => (
+                  <div key={book._id} className="book-card">
+                    <div className="book-card-inner">
+                      <img
+                        src={book.cover_img || "/default-cover.png"}
+                        alt={book.title}
+                        className="book-cover"
+                      />
+                      <button
+                        className="remove-btn"
+                        onClick={() => removeFromShelf(book._id)}
+                        title="Remove book"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    <div className="book-info">
+                      <h3 className="book-title">{book.title}</h3>
+                      <p className="book-author">{book.author}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
