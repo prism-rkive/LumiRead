@@ -62,6 +62,15 @@ function SearchPage() {
     }
   }, [selectedGenre, selectedAuthor]);
 
+  // Filter valid books (title + thumbnail)
+  const filterValidBooks = (items) =>
+    (items || []).filter(
+      (book) =>
+        book.volumeInfo &&
+        book.volumeInfo.title &&
+        book.volumeInfo.imageLinks?.thumbnail
+    );
+
   const fetchInitialBooks = async () => {
     setInitialLoading(true);
     try {
@@ -76,14 +85,6 @@ function SearchPage() {
           `https://www.googleapis.com/books/v1/volumes?q=subject:thriller&orderBy=newest&maxResults=12`
         ),
       ]);
-
-      const filterValidBooks = (items) =>
-        (items || []).filter(
-          (book) =>
-            book.volumeInfo &&
-            book.volumeInfo.title &&
-            book.volumeInfo.imageLinks?.thumbnail
-        );
 
       setTrendingBooks(filterValidBooks(trending.data.items));
       setMostReadBooks(filterValidBooks(mostRead.data.items));
@@ -104,15 +105,20 @@ function SearchPage() {
 
       if (query.trim()) {
         searchQuery = query.trim();
+      } else if (selectedGenre === "bestseller-special") {
+        // special query to return many bestsellers
+        searchQuery = "bestseller";
+      } else if (selectedGenre !== "all") {
+        searchQuery = `subject:${selectedGenre}`;
       } else {
-        if (selectedGenre !== "all") {
-          searchQuery = `subject:${selectedGenre}`;
-        } else {
-          searchQuery = "books";
-        }
+        searchQuery = "books";
       }
 
-      if (selectedGenre !== "all" && query.trim()) {
+      if (
+        selectedGenre !== "all" &&
+        query.trim() &&
+        selectedGenre !== "bestseller-special"
+      ) {
         searchQuery += ` subject:${selectedGenre}`;
       }
 
@@ -126,14 +132,7 @@ function SearchPage() {
         )}&maxResults=40`
       );
 
-      setSearchResults(
-        (response.data.items || []).filter(
-          (book) =>
-            book.volumeInfo &&
-            book.volumeInfo.title &&
-            book.volumeInfo.imageLinks?.thumbnail
-        )
-      );
+      setSearchResults(filterValidBooks(response.data.items));
     } catch (error) {
       console.error("Error searching books:", error);
       setSearchResults([]);
@@ -161,12 +160,37 @@ function SearchPage() {
     navigate(`/book/${isbn}`, { state: { bookData: book } });
   };
 
-  const handleViewAll = (genreQuery) => {
-    setQuery("");
-    setSelectedGenre(genreQuery);
-    setSelectedAuthor("");
+  // Custom handler for Most Read VIEW ALL
+  const handleViewAllMostRead = async () => {
     setSearched(true);
-    handleSearchWithoutEvent();
+    setQuery("");
+    setSelectedGenre("bestseller-special"); // special internal flag
+    setSelectedAuthor("");
+    setLoading(true);
+
+    try {
+      const response = await axios.get(
+        `https://www.googleapis.com/books/v1/volumes?q=bestseller&orderBy=relevance&maxResults=40`
+      );
+      setSearchResults(filterValidBooks(response.data.items));
+    } catch (error) {
+      console.error(error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewAll = (genreQuery) => {
+    if (genreQuery === "bestseller") {
+      handleViewAllMostRead();
+    } else {
+      setQuery("");
+      setSelectedGenre(genreQuery);
+      setSelectedAuthor("");
+      setSearched(true);
+      handleSearchWithoutEvent();
+    }
   };
 
   const BookCard = ({ book }) => {
@@ -216,7 +240,6 @@ function SearchPage() {
       <Sidebar />
       <div className="search-content">
         <div className="search-container">
-          {/* Header Section */}
           <div className="search-header">
             <h1>
               Explore <span className="highlight">Books</span>
@@ -225,7 +248,6 @@ function SearchPage() {
               Discover thousands of books from around the world
             </p>
 
-            {/* Search Bar */}
             <form onSubmit={handleSearch}>
               <div className="search-bar-wrapper">
                 <div className="search-input-group">
@@ -265,7 +287,6 @@ function SearchPage() {
               </div>
             </form>
 
-            {/* Filters */}
             {showFilters && (
               <div className="filters-panel">
                 <div className="filter-group">
@@ -297,7 +318,6 @@ function SearchPage() {
             )}
           </div>
 
-          {/* Search Results */}
           {searched && (
             <div className="search-results-section">
               <button
@@ -338,7 +358,6 @@ function SearchPage() {
             </div>
           )}
 
-          {/* Book Collections - Show only when not searching */}
           {!searched && (
             <>
               {initialLoading ? (

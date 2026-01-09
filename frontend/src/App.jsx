@@ -14,9 +14,10 @@ import BookDetails from "./components/main/pages/book/index";
 import Shelf from "./components/main/pages/Shelf";
 import ClubPage from "./components/main/pages/clubpage";
 import MyBookClubs from "./components/main/pages/MyBookClubs";
-import CreateClub from "./components/main/pages/CreateClub"; //correct
+import CreateClub from "./components/main/pages/CreateClub";
 import AllBookClubs from "./components/main/pages/AllBookClubs";
 import ProfilePage from "./pages/ProfilePage";
+
 // Protected Route - only accessible if logged in
 const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem("currentUser");
@@ -30,7 +31,6 @@ const PublicRoute = ({ children }) => {
 };
 
 function App() {
-  // Theme: 'light' | 'dark'
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
@@ -81,6 +81,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Profile Page */}
           <Route
             path="/profile"
             element={
@@ -89,6 +91,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Community Feed */}
           <Route
             path="/community"
             element={<CommunityFeed theme={theme} toggleTheme={toggleTheme} />}
@@ -113,6 +117,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Bookshelf */}
           <Route
             path="/bookshelf"
             element={
@@ -131,6 +137,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Create Club */}
           <Route
             path="/create-club"
             element={
@@ -139,6 +147,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* My Book Clubs */}
           <Route
             path="/my-clubs"
             element={
@@ -147,6 +157,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* All Book Clubs */}
           <Route
             path="/clubs"
             element={

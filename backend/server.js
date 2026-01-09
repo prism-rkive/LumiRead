@@ -7,17 +7,28 @@ import path from "path";
 import userRoutes from "./routes/userRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import communityRoutes from "./routes/communityRoutes.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
-import { protect } from "./middleware/authMiddleware.js";
-import { registerUser, authUser } from "./controllers/userController.js";
 import bookshelfRoutes from "./routes/bookshelfRoutes.js";
 import bookclubRoutes from "./routes/bookclubRoutes.js";
 import clubpostRoutes from "./routes/clubpostRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+
+import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import { protect } from "./middleware/authMiddleware.js";
+import { registerUser, authUser } from "./controllers/userController.js";
+import {
+  searchBooks,
+  checkBook,
+  addBook,
+  getBook,
+  addReview,
+} from "./controllers/bookController.js";
+
 dotenv.config();
 connectDB();
 
 const app = express();
+
 // Configure CORS for frontend access (assuming frontend runs on 3000 or similar)
 app.use(
   cors({
@@ -33,6 +44,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -47,19 +59,14 @@ app.use("/api/bookshelf", bookshelfRoutes);
 app.use("/api/bookclub", bookclubRoutes);
 app.use("/api/clubpost", clubpostRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/api/upload", uploadRoutes);
+
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Legacy support for stale frontends
 app.post("/register", registerUser);
 app.post("/login", authUser);
 
-import {
-  searchBooks,
-  checkBook,
-  addBook,
-  getBook,
-  addReview,
-} from "./controllers/bookController.js";
 app.post("/search", searchBooks);
 app.post("/checkbook", checkBook);
 app.post("/addbook", addBook);

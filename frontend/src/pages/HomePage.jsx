@@ -214,6 +214,7 @@ export default function HomePage() {
               label="My BookShelf"
               onClick={() => handleNavigation("/bookshelf")}
             />
+
             <ActionButton
               className="w-full justify-center py-4 bg-red-50 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-none transition-transform active:scale-95"
               icon={Club}
@@ -222,22 +223,27 @@ export default function HomePage() {
             />
           </div>
         </div>
-        {/* Overview Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
-          <div className="lg:col-span-2 space-y-8">
-            <ReadingOverview books={books} />
-            <CommunityOverview
-              feed={feed}
-              onExpand={() => handleNavigation("/my-clubs")}
-              showViewAll={true}
-            />
-          </div>
-          <div className="lg:col-span-1 space-y-8">
-            <UserStats
-              stats={
-                user?.readingGoals || { year: 0, completed: 0, pagesRead: 0 }
-              }
-            />
+        {/* Overview Grid - Expanded like Quick Actions */}
+        <div className="mb-12">
+          <div className="p-8 bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 border-l-4 border-l-red-500 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none transition-all">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white flex items-center tracking-tight">
+                <BookMarked className="w-6 h-6 mr-3 text-red-600" />
+                Reading Overview
+              </h3>
+              <span className="hidden sm:block text-sm text-gray-400 font-medium">
+                Your reading activity
+              </span>
+            </div>
+
+            <div className="space-y-8">
+              <ReadingOverview books={books} />
+              <CommunityOverview
+                feed={feed}
+                onExpand={() => handleNavigation("/my-clubs")}
+                showViewAll={true}
+              />
+            </div>
           </div>
         </div>
       </main>

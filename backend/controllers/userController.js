@@ -122,9 +122,47 @@ export const getUserProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       avatar: user.avatar,
+      bio: user.bio,
+      age: user.age,
       readingGoals: user.readingGoals,
     },
   });
+};
+
+// @desc    Update user profile
+// @route   PUT /api/user/profile
+// @access  Private
+export const updateUserProfile = async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.avatar = req.body.avatar || user.avatar;
+    user.bio = req.body.bio || user.bio;
+    user.age = req.body.age || user.age;
+
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(req.body.password, salt);
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      avatar: updatedUser.avatar,
+      bio: updatedUser.bio,
+      age: updatedUser.age,
+      token: generateToken(updatedUser._id),
+      status: true,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 };
 
 // @desc    Check auth status (Legacy support)
