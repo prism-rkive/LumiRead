@@ -46,7 +46,7 @@ function SearchPage() {
     "business",
     "poetry",
   ];
-
+    //after page loads, fetch some books immediately
   useEffect(() => {
     fetchInitialBooks();
   }, []);

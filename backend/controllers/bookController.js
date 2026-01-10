@@ -24,7 +24,7 @@ export const addBook = async (req, res) => {
       const alreadyInShelf = user.bookshelf.some(id => id.toString() === book._id.toString());
 
       if (alreadyInShelf) {
-        return res.json({ status: true, type: "exists", message: "Book added to shelf!" });
+        return res.json({ status: true, type: "exists", message: "Book already exists" });
       } else {
         user.bookshelf.push(book._id);
         await user.save();

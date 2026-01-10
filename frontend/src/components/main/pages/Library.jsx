@@ -28,8 +28,8 @@ const LibraryPage = () => {
     };
 
     useEffect(() => {
-        fetchAllBooks();
-    }, []);
+        fetchAllBooks();//what we want to do as an effect
+    }, []);//will run at least once , to avoid infinite loop of rerendering
 
     const filteredBooks = books.filter(book =>
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -12,33 +12,50 @@ const DiscoverAuthors = () => {
     const [trendingAuthors, setTrendingAuthors] = useState([]);
 
     useEffect(() => {
-        // Curated list of trending/popular authors with genres for disambiguation
-        const POPULAR_AUTHORS = [
-            { name: "Stephen King", genre: "Horror" },
-            { name: "J.K. Rowling", genre: "Fantasy" },
-            { name: "George R.R. Martin", genre: "Fantasy" },
-            { name: "Agatha Christie", genre: "Mystery" },
-            { name: "Haruki Murakami", genre: "Fiction" },
-            { name: "Neil Gaiman", genre: "Fantasy" },
-            { name: "Colleen Hoover", genre: "Romance" },
-            { name: "Brandon Sanderson", genre: "Fantasy" }
-        ];
-
-        setTrendingAuthors(POPULAR_AUTHORS.map(a => ({ ...a, image: null })));
-
-        // Fetch images for trending authors
-        POPULAR_AUTHORS.forEach(async (authObj) => {
+        const fetchTrendingAuthors = async () => {
             try {
-                const res = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(authObj.name)}`);
-                if (res.data?.thumbnail?.source) {
-                    setTrendingAuthors(prev => prev.map(a =>
-                        a.name === authObj.name && a.genre === authObj.genre ? { ...a, image: res.data.thumbnail.source } : a
-                    ));
+                // Fetch bestsellers from Google Books to identify trending authors
+                const response = await axios.get("https://www.googleapis.com/books/v1/volumes?q=bestseller&orderBy=relevance&maxResults=40");
+
+                if (response.data.items) {
+                    const authorMap = new Map();
+
+                    response.data.items.forEach(item => {
+                        const info = item.volumeInfo;
+                        if (info.authors && info.authors.length > 0) {
+                            const name = info.authors[0];
+                            const genre = (info.categories && info.categories.length > 0) ? info.categories[0] : "General";
+                            const key = `${name}|${genre}`;
+
+                            if (!authorMap.has(key) && authorMap.size < 8) {
+                                authorMap.set(key, { name, genre, image: null });
+                            }
+                        }
+                    });
+
+                    const dynamicAuthors = Array.from(authorMap.values());
+                    setTrendingAuthors(dynamicAuthors);
+
+                    // Fetch images for these dynamic authors
+                    dynamicAuthors.forEach(async (authObj) => {
+                        try {
+                            const res = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(authObj.name)}`);
+                            if (res.data?.thumbnail?.source) {
+                                setTrendingAuthors(prev => prev.map(a =>
+                                    a.name === authObj.name && a.genre === authObj.genre ? { ...a, image: res.data.thumbnail.source } : a
+                                ));
+                            }
+                        } catch (e) {
+                            // quiet fail
+                        }
+                    });
                 }
-            } catch (e) {
-                // quiet fail
+            } catch (err) {
+                console.error("Failed to fetch trending authors", err);
             }
-        });
+        };
+
+        fetchTrendingAuthors();
     }, []);
 
     useEffect(() => {
