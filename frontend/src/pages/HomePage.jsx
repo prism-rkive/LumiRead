@@ -10,6 +10,7 @@ import {
   Moon,
   Sun,
   LibraryBig,
+  Library,
   Club,
   List,
   User,
@@ -130,7 +131,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="flex justify-between items-center max-w-7xl mx-auto py-2 px-4 sm:px-8 mb-8">
         <h1 className="text-3xl font-extrabold text-red-700 dark:text-red-400">
-          LumiRead
+          BiblioHub
         </h1>
         <div className="flex space-x-2 sm:space-x-4 items-center">
           <button
@@ -196,7 +197,7 @@ export default function HomePage() {
           </div>
 
           {/* Grid layout for better alignment than flex-wrap */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <ActionButton
               className="w-full justify-center py-4 bg-red-50 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-none transition-transform active:scale-95"
               icon={BookPlus}
@@ -208,6 +209,12 @@ export default function HomePage() {
               icon={Search}
               label="Search Catalog"
               onClick={() => handleNavigation("/search")}
+            />
+            <ActionButton
+              className="w-full justify-center py-4 bg-red-50 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-none transition-transform active:scale-95"
+              icon={Library}
+              label="Library"
+              onClick={() => handleNavigation("/library")}
             />
             <ActionButton
               className="w-full justify-center py-4 bg-red-50 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-gray-600 border-none transition-transform active:scale-95"

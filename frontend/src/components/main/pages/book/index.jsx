@@ -261,31 +261,53 @@ function BookDetails() {
     if (!currentUser.token) return alert("Please login to add books to your shelf");
     setAddingToShelf(true);
 
-    try {
-      const info = book.volumeInfo;
-      const bookData = {
-        title: info.title,
-        ibn: getBookIsbn(),
-        author: info.authors?.join(", "),
-        cover_img: info.imageLinks?.thumbnail,
-        description: info.description?.replace(/<[^>]*>/g, ""),
-        language: info.language,
-        year: info.publishedDate
-          ? parseInt(info.publishedDate.split("-")[0])
-          : null,
-        genre: info.categories || [],
-      };
+    const info = book.volumeInfo;
+    const bookData = {
+      title: info.title,
+      ibn: getBookIsbn(),
+      author: info.authors?.join(", "),
+      cover_img: info.imageLinks?.thumbnail,
+      description: info.description?.replace(/<[^>]*>/g, ""),
+      language: info.language,
+      year: info.publishedDate
+        ? parseInt(info.publishedDate.split("-")[0])
+        : null,
+      genre: info.categories || [],
+    };
 
+    try {
       // 1. Ensure book exists in DB
       try {
-        await api.post("/addbook", bookData, {
+        const addRes = await api.post("/addbook", bookData, {
           headers: { Authorization: `Bearer ${currentUser.token}` },
         });
+
+        // If addRes confirms it's in the shelf, we're done!
+        if (addRes.data.status && addRes.data.message && addRes.data.message.toLowerCase().includes("shelf")) {
+          setIsInShelf(true);
+          alert(addRes.data.message);
+          setAddingToShelf(false);
+          return;
+        }
       } catch (e) {
-        // Ignore if exists
+        // If creation failed due to Auth (401), STOP.
+        if (e.response && e.response.status === 401) {
+          alert("Session expired. Please login again.");
+          setAddingToShelf(false);
+          return;
+        }
+        console.warn("Add book failed (might exist, or other error):", e);
+        // If it's another error (500, 400), we probably shouldn't proceed either, 
+        // to be safe, let's stop on any error from addbook to prevent invalid state.
+        // User reported: "You still call this even though addbook failed."
+        setAddingToShelf(false);
+        return;
       }
 
-      // 2. Add to Shelf
+      // 2. Add to Shelf (Only reached if addbook succeeded or didn't throw)
+      // Note: backend addbook returns {status:false, type:'exists'} on 200 OK if exists.
+      // So 'try' block completes. 'catch' is only for network/auth errors.
+
       const res = await api.post("/api/bookshelf/addtoShelf", { ibn: bookData.ibn }, {
         headers: { Authorization: `Bearer ${currentUser.token}` },
       });
@@ -299,7 +321,12 @@ function BookDetails() {
 
     } catch (err) {
       console.error("Add to shelf failed", err);
-      alert("Something went wrong");
+      // Check for 401 from addToShelf as well
+      if (err.response && err.response.status === 401) {
+        alert("Session expired. Please login again.");
+      } else {
+        alert("Something went wrong");
+      }
     } finally {
       setAddingToShelf(false);
     }
@@ -561,27 +588,6 @@ function BookDetails() {
             ) : (
               <p>No community reviews yet.</p>
             )}
-          </div>
-          {/* Additional Information Section (Restored) */}
-          <div className="additional-info-section">
-            <h3 className="section-title" style={{ fontSize: "1.1rem" }}>
-              Additional Information
-            </h3>
-            <div className="info-grid">
-              <div className="info-item">
-                <strong>ISBN</strong> <span>{getBookIsbn()}</span>
-              </div>
-              <div className="info-item">
-                <strong>Page Count</strong> <span>{info.pageCount}</span>
-              </div>
-              <div className="info-item">
-                <strong>Publisher</strong> <span>{info.publisher}</span>
-              </div>
-              <div className="info-item">
-                <strong>Published Date</strong>{" "}
-                <span>{info.publishedDate}</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

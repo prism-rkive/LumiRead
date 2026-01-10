@@ -122,7 +122,7 @@ function SignedOut() {
         }}
       >
         <div className="auth-left-content">
-          <h1>LumiRead</h1>
+          <h1>BiblioHub</h1>
           <p>Track, review, and discover your next favorite book</p>
         </div>
       </div>
@@ -198,9 +198,8 @@ function SignedOut() {
 
             {message && (
               <div
-                className={`message ${
-                  message.includes("Success") ? "success" : "error"
-                }`}
+                className={`message ${message.includes("Success") ? "success" : "error"
+                  }`}
               >
                 {message}
               </div>

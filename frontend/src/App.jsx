@@ -18,6 +18,7 @@ import AllBookClubs from "./components/main/pages/AllBookClubs";
 import ProfilePage from "./pages/ProfilePage";
 import DiscoverAuthors from "./components/main/pages/authors/DiscoverAuthors";
 import AuthorProfile from "./components/main/pages/authors/AuthorProfile";
+import Library from "./components/main/pages/Library";
 
 // Protected Route - only accessible if logged in
 const ProtectedRoute = ({ children }) => {
@@ -119,6 +120,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <Shelf />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Global Library */}
+          <Route
+            path="/library"
+            element={
+              <ProtectedRoute>
+                <Library />
               </ProtectedRoute>
             }
           />

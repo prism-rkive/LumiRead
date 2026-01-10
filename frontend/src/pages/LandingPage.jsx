@@ -17,7 +17,7 @@ export default function LandingPage() {
 
                 {/* Title */}
                 <h1 className="text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                    Welcome to <span className="text-red-600">LumiRead</span>
+                    Welcome to <span className="text-red-600">BiblioHub</span>
                 </h1>
 
                 {/* Subtitle */}

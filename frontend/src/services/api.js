@@ -48,6 +48,8 @@ export const addBookToShelf = (payload) =>
 export const getCommunityFeed = () => fetchJson("/api/clubpost/feed");
 
 // ----------------- BOOK APIs -----------------
+export const getAllLibraryBooks = () => fetchJson("/api/books/all");
+
 export const addBook = (payload) =>
   fetchJson("/api/books", {
     method: "POST",

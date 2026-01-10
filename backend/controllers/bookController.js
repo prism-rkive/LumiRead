@@ -8,36 +8,33 @@ export const getCurrentBooks = async (req, res) => {
 };
 
 // POST /api/books
-// POST /api/books
 export const addBook = async (req, res) => {
-  // Logic matches what the frontend AddBook component sends
   const { ibn, title, author, language, cover_img, description, buy_url, year, genre } = req.body;
-  const token = req.headers.authorization?.split(" ")[1];
+  const user = req.user; // From protect middleware
 
-  // We need to get userId from the token if possible, but middleware setting req.user isn't global yet.
-  // We can decode purely for ID if we trust the checkAuth logic on frontend, OR better, 
-  // rely on the fact that isAuthed/checkAuth was called.
-  // Ideally, we should parse the token here or use middleware.
-  // For now, let's assume if it hits here with a valid token (verified by middleware later), 
-  // we can get the ID from it.
-
-  // Actually, let's decode it for safety if not using middleware, or assume middleware will be added.
-  // Let's grab it from the token manually for now since `protect` middleware isn't wrapped around this route in `bookRoutes`.
-
-  /*
-  if (!token) {
-     return res.status(401).json({ status: false, message: "Not authorized" });
-  }
-  */
-
-  // Note: Validation is done on frontend mostly, but let's double check unique ISBN
-  const bookExists = await Book.findOne({ ibn });
-  if (bookExists) {
-    return res.json({ status: false, type: "exists" });
+  if (!user) {
+    return res.status(401).json({ status: false, message: "Not authorized" });
   }
 
   try {
-    const book = await Book.create({
+    let book = await Book.findOne({ ibn });
+
+    if (book) {
+      // Check if already in user's shelf
+      const alreadyInShelf = user.bookshelf.some(id => id.toString() === book._id.toString());
+
+      if (alreadyInShelf) {
+        return res.json({ status: true, type: "exists", message: "Book added to shelf!" });
+      } else {
+        user.bookshelf.push(book._id);
+        await user.save();
+        return res.json({ status: true, message: "Book added to shelf!" });
+      }
+    }
+
+    // Create new book
+    book = await Book.create({
+      userId: user._id,
       ibn,
       title,
       author,
@@ -46,15 +43,14 @@ export const addBook = async (req, res) => {
       description,
       buy_url,
       year,
-      genre, // Array or string? Model expects array. Frontend sends array.
-      // Missing fields compared to new model?
-      // "userId" is required in new model...
-      // Let's create a placeholder or optional.
-      // We removed "required" from userId in my previous edit? Let me check model.
-      // I'm gonna assume we need to attach a user.
+      genre: Array.isArray(genre) ? genre : (genre ? genre.split(',') : []),
     });
 
-    res.json({ status: true });
+    // Add to shelf
+    user.bookshelf.push(book._id);
+    await user.save();
+
+    res.json({ status: true, message: "Book added to shelf!" });
   } catch (error) {
     res.status(500).json({ status: false, type: "save", error: error.message });
   }
@@ -185,6 +181,19 @@ export const addReview = async (req, res) => {
     const updatedBook = await Book.findOne({ ibn }).populate("reviews.user_id", "name username");
 
     res.status(201).json({ status: true, message: "Review added", data: updatedBook });
+  } catch (error) {
+    res.status(500).json({ status: false, error: error.message });
+  }
+};
+
+// GET /api/books/all
+export const getAllBooks = async (req, res) => {
+  try {
+    const books = await Book.find({}).sort({ createdAt: -1 });
+    res.json({
+      status: true,
+      data: books,
+    });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }

@@ -9,6 +9,7 @@ import {
   PlusCircle,
   ChevronRight,
   LibraryBig,
+  Library,
   BookPlus,
   User,
 } from "lucide-react";
@@ -18,8 +19,9 @@ const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { name: "Home", path: "/", icon: Home },
+    { name: "Home", path: "/home", icon: Home },
     { name: "Search Books", path: "/search", icon: Search },
+    { name: "Global Library", path: "/library", icon: Library },
     { name: "My Bookshelf", path: "/bookshelf", icon: LibraryBig },
     { name: "Add Books", path: "/addbook", icon: BookPlus },
     { name: "Search Clubs", path: "/clubs", icon: Search },
@@ -47,7 +49,7 @@ const Sidebar = () => {
         <div className="flex flex-col h-full pt-24 px-6 pb-8">
           <div className="mb-10 px-2">
             <h2 className="text-2xl font-black text-red-700 dark:text-red-400">
-              LumiRead
+              BiblioHub
             </h2>
             <p className="text-xs text-gray-400 font-medium tracking-widest uppercase mt-1">
               Navigation
@@ -88,7 +90,7 @@ const Sidebar = () => {
           {/* Footer of Sidebar */}
           <div className="mt-auto p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700">
             <p className="text-[10px] text-gray-400 text-center font-bold uppercase tracking-tighter">
-              &copy; {new Date().getFullYear()} LumiRead Community
+              &copy; {new Date().getFullYear()} BiblioHub Community
             </p>
           </div>
         </div>

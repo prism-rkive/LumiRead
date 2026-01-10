@@ -12,23 +12,27 @@ const DiscoverAuthors = () => {
     const [trendingAuthors, setTrendingAuthors] = useState([]);
 
     useEffect(() => {
-        // Curated list of trending/popular authors to ensure quality content
+        // Curated list of trending/popular authors with genres for disambiguation
         const POPULAR_AUTHORS = [
-            "Stephen King", "J.K. Rowling", "George R.R. Martin",
-            "Agatha Christie", "Haruki Murakami", "Neil Gaiman",
-            "Colleen Hoover", "Brandon Sanderson"
+            { name: "Stephen King", genre: "Horror" },
+            { name: "J.K. Rowling", genre: "Fantasy" },
+            { name: "George R.R. Martin", genre: "Fantasy" },
+            { name: "Agatha Christie", genre: "Mystery" },
+            { name: "Haruki Murakami", genre: "Fiction" },
+            { name: "Neil Gaiman", genre: "Fantasy" },
+            { name: "Colleen Hoover", genre: "Romance" },
+            { name: "Brandon Sanderson", genre: "Fantasy" }
         ];
 
-        const initialTrending = POPULAR_AUTHORS.map(name => ({ name, image: null }));
-        setTrendingAuthors(initialTrending);
+        setTrendingAuthors(POPULAR_AUTHORS.map(a => ({ ...a, image: null })));
 
         // Fetch images for trending authors
-        initialTrending.forEach(async (authObj) => {
+        POPULAR_AUTHORS.forEach(async (authObj) => {
             try {
                 const res = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(authObj.name)}`);
                 if (res.data?.thumbnail?.source) {
                     setTrendingAuthors(prev => prev.map(a =>
-                        a.name === authObj.name ? { ...a, image: res.data.thumbnail.source } : a
+                        a.name === authObj.name && a.genre === authObj.genre ? { ...a, image: res.data.thumbnail.source } : a
                     ));
                 }
             } catch (e) {
@@ -51,33 +55,37 @@ const DiscoverAuthors = () => {
                 });
 
                 if (data.status && data.data) {
-                    // Extract unique authors
-                    const authorSet = new Set();
+                    // Extract unique authors based on Name + Primary Genre
+                    const authorMap = new Map(); // key: "Name|Genre"
                     const books = data.data;
 
                     books.forEach(book => {
                         if (book.author) {
-                            authorSet.add(book.author);
+                            const normalizedName = book.author.trim();
+                            const primaryGenre = (book.genre && book.genre.length > 0) ? book.genre[0] : "General";
+                            const key = `${normalizedName}|${primaryGenre}`;
+
+                            if (!authorMap.has(key)) {
+                                authorMap.set(key, {
+                                    name: normalizedName,
+                                    genre: primaryGenre,
+                                    image: null
+                                });
+                            }
                         }
                     });
 
-                    const uniqueAuthors = Array.from(authorSet);
-
-                    // Initial state with name and no image
-                    const initialAuthors = uniqueAuthors.map(name => ({
-                        name,
-                        image: null
-                    }));
-                    setAuthors(initialAuthors);
+                    const uniqueAuthors = Array.from(authorMap.values());
+                    setAuthors(uniqueAuthors);
                     setLoading(false);
 
                     // Fetch images asynchronously for each author
-                    initialAuthors.forEach(async (authObj) => {
+                    uniqueAuthors.forEach(async (authObj) => {
                         try {
                             const res = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(authObj.name)}`);
                             if (res.data?.thumbnail?.source) {
                                 setAuthors(prev => prev.map(a =>
-                                    a.name === authObj.name ? { ...a, image: res.data.thumbnail.source } : a
+                                    a.name === authObj.name && a.genre === authObj.genre ? { ...a, image: res.data.thumbnail.source } : a
                                 ));
                             }
                         } catch (e) {
@@ -126,7 +134,7 @@ const DiscoverAuthors = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {authors.map((author, index) => (
                             <Link
-                                to={`/author/${encodeURIComponent(author.name)}`}
+                                to={`/author/${encodeURIComponent(author.name)}?genre=${encodeURIComponent(author.genre)}`}
                                 key={index}
                                 className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 flex flex-col items-center text-center"
                             >
@@ -140,7 +148,8 @@ const DiscoverAuthors = () => {
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-red-600 transition-colors">
                                     {author.name}
                                 </h3>
-                                <span className="text-sm text-gray-500 font-medium flex items-center mt-2 group-hover:translate-x-1 transition-transform">
+                                <p className="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-tighter mb-3">{author.genre}</p>
+                                <span className="text-sm text-gray-500 font-medium flex items-center mt-auto group-hover:translate-x-1 transition-transform">
                                     View Profile <ChevronRight size={14} className="ml-1" />
                                 </span>
                             </Link>
@@ -161,7 +170,7 @@ const DiscoverAuthors = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-12">
                     {trendingAuthors.map((author, index) => (
                         <Link
-                            to={`/author/${encodeURIComponent(author.name)}`}
+                            to={`/author/${encodeURIComponent(author.name)}?genre=${encodeURIComponent(author.genre)}`}
                             key={index + 1000}
                             className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 flex flex-col items-center text-center"
                         >
@@ -175,7 +184,8 @@ const DiscoverAuthors = () => {
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-red-600 transition-colors">
                                 {author.name}
                             </h3>
-                            <span className="text-sm text-gray-500 font-medium flex items-center mt-2 group-hover:translate-x-1 transition-transform">
+                            <p className="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-tighter mb-3">{author.genre}</p>
+                            <span className="text-sm text-gray-500 font-medium flex items-center mt-auto group-hover:translate-x-1 transition-transform">
                                 View Profile <ChevronRight size={14} className="ml-1" />
                             </span>
                         </Link>

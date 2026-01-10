@@ -23,20 +23,28 @@
 
 .auth-left-content {
   text-align: center;
-  color: white;
   max-width: 600px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 40px;
+  border-radius: 24px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .auth-left-content h1 {
   font-size: 3.5rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 20px;
   line-height: 1.2;
+  color: #a84448;
+  letter-spacing: -0.02em;
 }
 
 .auth-left-content p {
-  font-size: 1.3rem;
-  opacity: 0.9;
+  font-size: 1.35rem;
+  color: #1f2937;
+  font-weight: 500;
 }
 
 /* Right Side - Form */
@@ -249,4 +257,87 @@
   .auth-form-header h2 {
     font-size: 1.75rem;
   }
+}
+
+/* Dark Mode Overrides */
+:root.dark .auth-right {
+  background: #111827;
+  /* gray-900 */
+}
+
+:root.dark .auth-form-container {
+  background: #1f2937;
+  /* gray-800 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #374151;
+}
+
+:root.dark .auth-form-header h2 {
+  color: #f3f4f6;
+  /* gray-100 */
+}
+
+:root.dark .auth-form-header p {
+  color: #9ca3af;
+  /* gray-400 */
+}
+
+:root.dark .form-group label {
+  color: #e5e7eb;
+  /* gray-200 */
+}
+
+:root.dark .form-group input {
+  background: #374151;
+  /* gray-700 */
+  border-color: #4b5563;
+  /* gray-600 */
+  color: #f3f4f6;
+  /* white */
+}
+
+:root.dark .form-group input:focus {
+  border-color: #ef4444;
+  /* red-500 */
+  background: #4b5563;
+}
+
+:root.dark .form-group input::placeholder {
+  color: #9ca3af;
+}
+
+:root.dark .auth-button {
+  background: #dc2626;
+  /* red-600 */
+}
+
+:root.dark .auth-button:hover {
+  background: #b91c1c;
+  /* red-700 */
+}
+
+:root.dark .auth-footer p {
+  color: #9ca3af;
+}
+
+:root.dark .auth-footer span {
+  color: #ef4444;
+}
+
+:root.dark .auth-footer span:hover {
+  color: #f87171;
+}
+
+:root.dark .auth-left-content {
+  background: rgba(17, 24, 39, 0.75);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+:root.dark .auth-left-content h1 {
+  color: #ff4d4d;
+}
+
+:root.dark .auth-left-content p {
+  color: #d1d5db;
 }

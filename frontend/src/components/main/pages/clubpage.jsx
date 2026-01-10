@@ -153,15 +153,15 @@ const ClubPage = () => {
     <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors font-sans pb-10">
       <Sidebar />
       {/* HEADER (Matching Home Page) */}
-         <header className="flex justify-between items-center max-w-7xl mx-auto py-6 px-4 sm:px-8 pl-20">        <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
-            <ArrowLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          </button>
-          <h1 className="text-3xl font-extrabold text-red-700 dark:text-red-400">LumiRead</h1>
-        </div>
-        
+      <header className="flex justify-between items-center max-w-7xl mx-auto py-6 px-4 sm:px-8 pl-20">        <div className="flex items-center gap-4">
+        <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
+          <ArrowLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+        </button>
+        <h1 className="text-3xl font-extrabold text-red-700 dark:text-red-400">BiblioHub</h1>
+      </div>
+
         {club.admin._id === user._id && (
-          <button 
+          <button
             onClick={() => setShowRequests(!showRequests)}
             className="relative p-3 rounded-full bg-red-100 text-red-700 hover:bg-red-200 transition-all"
           >
@@ -176,13 +176,13 @@ const ClubPage = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-8">
-        
+
         {/* CLUB HERO SECTION */}
         <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl mb-8 flex flex-col md:flex-row items-center gap-8 border border-gray-100 dark:border-gray-700">
           <div className="relative">
-            <img 
-              src={club.avatar || "https://via.placeholder.com/150"} 
-              alt={club.name} 
+            <img
+              src={club.avatar || "https://via.placeholder.com/150"}
+              alt={club.name}
               className="w-32 h-32 rounded-2xl object-cover shadow-lg border-4 border-red-50"
             />
             <div className="absolute -bottom-2 -right-2 bg-green-500 p-2 rounded-lg text-white shadow-lg">
@@ -202,12 +202,12 @@ const ClubPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* FEED COLUMN */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {/* START POST BOX */}
-            <div 
+            <div
               onClick={() => setShowCreatePost(true)}
               className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex items-center gap-4 cursor-pointer hover:border-red-300 transition-all group"
             >
@@ -223,7 +223,15 @@ const ClubPage = () => {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                      <img src={post.user.avatar || ""} className="w-10 h-10 rounded-full bg-gray-200" alt="" />
+                      <img
+                        src={
+                          post.user.avatar
+                            ? (post.user.avatar.startsWith("http") ? post.user.avatar : `http://localhost:5000${post.user.avatar}`)
+                            : `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user.name}`
+                        }
+                        className="w-10 h-10 rounded-full bg-gray-200 object-cover"
+                        alt={post.user.name}
+                      />
                       <div>
                         <h4 className="font-bold text-gray-900 dark:text-white">{post.user.name}</h4>
                         <p className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</p>
@@ -262,16 +270,38 @@ const ClubPage = () => {
                     <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2">
                       {post.comments.map((c) => (
                         <div key={c._id} className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="font-bold text-red-700 dark:text-red-400">{c.user.name}</span>
+                          <div className="flex items-center gap-3 mb-2">
+                            <img
+                              src={
+                                c.user.avatar
+                                  ? (c.user.avatar.startsWith("http") ? c.user.avatar : `http://localhost:5000${c.user.avatar}`)
+                                  : `https://api.dicebear.com/7.x/avataaars/svg?seed=${c.user.name}`
+                              }
+                              className="w-8 h-8 rounded-full object-cover"
+                              alt={c.user.name}
+                            />
+                            <div className="flex justify-between w-full text-sm">
+                              <span className="font-bold text-red-700 dark:text-red-400">{c.user.name}</span>
+                            </div>
                           </div>
-                          <p className="text-gray-700 dark:text-gray-300 text-sm">{c.text}</p>
-                          
+                          <p className="text-gray-700 dark:text-gray-300 text-sm ml-11">{c.text}</p>
+
                           {/* Replies */}
                           {c.replies.map((r) => (
-                            <div key={r._id} className="ml-6 mt-3 pl-3 border-l-2 border-red-200 text-sm">
-                              <span className="font-bold text-gray-800 dark:text-gray-200">{r.user.name}</span>
-                              <p className="text-gray-600 dark:text-gray-400">{r.text}</p>
+                            <div key={r._id} className="ml-11 mt-3 pl-3 border-l-2 border-red-200 text-sm">
+                              <div className="flex items-center gap-2 mb-1">
+                                <img
+                                  src={
+                                    r.user.avatar
+                                      ? (r.user.avatar.startsWith("http") ? r.user.avatar : `http://localhost:5000${r.user.avatar}`)
+                                      : `https://api.dicebear.com/7.x/avataaars/svg?seed=${r.user.name}`
+                                  }
+                                  className="w-6 h-6 rounded-full object-cover"
+                                  alt={r.user.name}
+                                />
+                                <span className="font-bold text-gray-800 dark:text-gray-200">{r.user.name}</span>
+                              </div>
+                              <p className="text-gray-600 dark:text-gray-400 ml-8">{r.text}</p>
                             </div>
                           ))}
 
@@ -309,7 +339,7 @@ const ClubPage = () => {
                   <Users className="w-5 h-5 text-red-600" />
                   Members
                 </h3>
-                <button 
+                <button
                   onClick={() => setShowAddMember(!showAddMember)}
                   className="p-2 bg-red-50 dark:bg-red-900/30 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
                 >
@@ -345,7 +375,15 @@ const ClubPage = () => {
               <div className="space-y-4">
                 {club.members.map((m) => (
                   <div key={m._id} className="flex items-center gap-3">
-                    <img src={m.avatar || `https://ui-avatars.com/api/?name=${m.name}`} className="w-10 h-10 rounded-full border-2 border-red-50" alt="" />
+                    <img
+                      src={
+                        m.avatar
+                          ? (m.avatar.startsWith("http") ? m.avatar : `http://localhost:5000${m.avatar}`)
+                          : `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.name}`
+                      }
+                      className="w-10 h-10 rounded-full border-2 border-red-50 object-cover"
+                      alt={m.name}
+                    />
                     <div>
                       <p className="text-sm font-bold text-gray-800 dark:text-gray-200">{m.name}</p>
                       {club.admin._id === m._id && <p className="text-[10px] uppercase tracking-widest text-red-500 font-bold">Admin</p>}
@@ -394,9 +432,9 @@ const ClubPage = () => {
               <button onClick={() => setShowCreatePost(false)} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full"><X className="w-6 h-6" /></button>
             </div>
             <div className="p-6 space-y-4">
-              <div 
+              <div
                 className="min-h-[150px] p-4 bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl focus-within:border-red-500 outline-none overflow-y-auto prose dark:prose-invert"
-                contentEditable 
+                contentEditable
                 onInput={(e) => setPostContent(e.currentTarget.innerHTML)}
                 placeholder="Write your thoughts..."
               />
@@ -411,7 +449,7 @@ const ClubPage = () => {
                   <input className="bg-transparent border-none text-sm w-full outline-none" placeholder="Tags (comma separated)" value={postTags} onChange={(e) => setPostTags(e.target.value)} />
                 </div>
               </div>
-              <button 
+              <button
                 onClick={createPost}
                 disabled={!postContent}
                 className="w-full py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-extrabold rounded-2xl shadow-xl shadow-red-500/20 transition-all flex items-center justify-center gap-2"

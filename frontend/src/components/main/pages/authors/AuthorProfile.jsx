@@ -11,12 +11,26 @@ const AuthorProfile = () => {
     const [bio, setBio] = useState("");
     const [authorImage, setAuthorImage] = useState(null);
 
+    // Get genre from query params for better disambiguation
+    const queryParams = new URLSearchParams(window.location.search);
+    const genre = queryParams.get("genre");
+
     useEffect(() => {
         const fetchAuthorData = async () => {
             setLoading(true);
             try {
                 // Fetch books by author from Google Books API
-                const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=inauthor:"${name}"&maxResults=20`);
+                // Include genre in query if available to narrow down same-named authors
+                const query = genre
+                    ? `inauthor:"${name}"+subject:"${genre}"`
+                    : `inauthor:"${name}"`;
+
+                const res = await axios.get("https://www.googleapis.com/books/v1/volumes", {
+                    params: {
+                        q: query,
+                        maxResults: 20
+                    }
+                });
 
                 if (res.data.items) {
                     const uniqueBooks = [];

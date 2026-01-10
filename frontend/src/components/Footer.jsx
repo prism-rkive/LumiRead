@@ -6,7 +6,7 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
       <div>
         <h4 className="font-extrabold text-lg text-red-700 dark:text-red-400 mb-4">
-          LumiRead
+          BiblioHub
         </h4>
         <ul className="space-y-3 text-gray-600 dark:text-gray-400">
           <li className="hover:text-red-600 cursor-pointer transition-colors">
@@ -70,7 +70,7 @@ const Footer = () => (
       </div>
     </div>
     <div className="mt-10 text-center text-xs text-gray-500 dark:text-gray-600 border-t pt-6 border-gray-300 dark:border-gray-700">
-      &copy; {new Date().getFullYear()} LumiRead. Built using React and Tailwind
+      &copy; {new Date().getFullYear()} BiblioHub. Built using React and Tailwind
       CSS.
     </div>
   </footer>

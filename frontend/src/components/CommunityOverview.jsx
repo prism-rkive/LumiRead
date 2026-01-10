@@ -48,15 +48,26 @@ export default function CommunityOverview({
               className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
               onClick={() => onPostClick && onPostClick(post.clubId)}
             >
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-semibold text-gray-800 dark:text-gray-200">
-                  {post.user}
-                </span>
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={
+                      post.avatar
+                        ? (post.avatar.startsWith("http") ? post.avatar : `http://localhost:5000${post.avatar}`)
+                        : `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.user}`
+                    }
+                    className="w-8 h-8 rounded-full object-cover"
+                    alt={post.user}
+                  />
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">
+                    {post.user}
+                  </span>
+                </div>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   {post.time}
                 </span>
               </div>
-              <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+              <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap ml-11">
                 {displayContent}
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">

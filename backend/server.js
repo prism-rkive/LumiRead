@@ -35,11 +35,11 @@ app.use(
     origin:
       process.env.NODE_ENV === "development"
         ? [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://localhost:3002",
-            "http://localhost:5173",
-          ]
+          "http://localhost:3000",
+          "http://localhost:3001",
+          "http://localhost:3002",
+          "http://localhost:5173",
+        ]
         : process.env.PRODUCTION_FRONTEND_URL,
     credentials: true,
   })
@@ -48,7 +48,7 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("LumiRead Backend Running...");
+  res.send("BiblioHub Backend Running...");
 });
 
 // Primary Routes
@@ -69,7 +69,7 @@ app.post("/login", authUser);
 
 app.post("/search", searchBooks);
 app.post("/checkbook", checkBook);
-app.post("/addbook", addBook);
+app.post("/addbook", protect, addBook);
 app.post("/getbook", getBook);
 app.post("/addreview", protect, addReview);
 
